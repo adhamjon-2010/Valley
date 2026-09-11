@@ -15,6 +15,10 @@
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
+  <!-- Leaflet CSS & JS for Real Google Satellite & Street Maps -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -53,6 +57,39 @@
     }
     .animate-fadeIn {
       animation: fadeIn 0.25s ease-out forwards;
+    }
+
+    /* Leaflet Custom Styling for Dark & Modern UI */
+    .leaflet-popup-content-wrapper {
+      background: #18181b !important;
+      color: #f4f4f5 !important;
+      border-radius: 1rem !important;
+      border: 1px solid #3f3f46 !important;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5) !important;
+      padding: 0 !important;
+      overflow: hidden;
+    }
+    .leaflet-popup-content {
+      margin: 0 !important;
+      line-height: 1.4 !important;
+    }
+    .leaflet-popup-tip {
+      background: #18181b !important;
+      border: 1px solid #3f3f46 !important;
+    }
+    .leaflet-container {
+      font-family: 'Plus Jakarta Sans', sans-serif !important;
+    }
+    .sport-pulse-marker {
+      position: relative;
+    }
+    .sport-pulse-marker::before {
+      content: '';
+      position: absolute;
+      inset: -6px;
+      border-radius: 9999px;
+      background: rgba(16, 185, 129, 0.4);
+      animation: ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
     }
   </style>
 </head>
@@ -119,6 +156,78 @@
     // --- DATA ---
     const INITIAL_VENUES = [
       {
+        id: 'v_fg1',
+        name: "Farg'ona 'Istiqlol' Markaziy Sport Majmuasi",
+        type: 'football_pitch',
+        category: 'Futbol / Yugurish',
+        sport: 'Futbol',
+        village: "Farg'ona",
+        address: "Farg'ona shahri, Istiqlol ko'chasi 1-uy",
+        lat: 40.3892,
+        lng: 71.7835,
+        pricePerHour: 180000,
+        rating: 4.9,
+        image: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80',
+        facilities: ["Xalqaro standartdagi stadion", "Yoritish projektorlari", "VIP kiyinish xonasi", "Dush va sauna"],
+        contactPerson: {
+          name: "Soliyev Olimjon",
+          role: "Majmua bosh direktori",
+          phone: "+998 90 160-22-33",
+          workHours: "07:00 - 23:00",
+          avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80"
+        },
+        coords: { x: 50, y: 20 },
+        subscription: { plan: '12 oylik', status: 'active', daysLeft: 310, expiresAt: '2027-01-15' }
+      },
+      {
+        id: 'v_fg2',
+        name: "Farg'ona Olimpiya Zaxiralari Voleybol va Basketbol Saroyi",
+        type: 'school_gym',
+        category: 'Voleybol / Basketbol',
+        sport: 'Voleybol',
+        village: "Farg'ona",
+        address: "Farg'ona shahri, Al-Farg'oniy shoh ko'chasi 42",
+        lat: 40.3815,
+        lng: 71.7780,
+        pricePerHour: 130000,
+        rating: 4.9,
+        image: 'https://images.unsplash.com/photo-1519766304817-4f37bda74a29?auto=format&fit=crop&w=800&q=80',
+        facilities: ["Parket pol", "Elektron tablo", "Professional voleybol to'ri", "Tribunalar"],
+        contactPerson: {
+          name: "Qosimov Alisher",
+          role: "Bosh murabbiy",
+          phone: "+998 91 650-44-55",
+          workHours: "08:00 - 22:00",
+          avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80"
+        },
+        coords: { x: 45, y: 25 },
+        subscription: { plan: '6 oylik', status: 'active', daysLeft: 180, expiresAt: '2026-09-10' }
+      },
+      {
+        id: 'v_fg3',
+        name: "Farg'ona 'Neftchi' Sun'iy Qoplamali Futbol Maydoni",
+        type: 'football_pitch',
+        category: 'Futbol',
+        sport: 'Futbol',
+        village: "Farg'ona",
+        address: "Farg'ona shahri, Yangi Asr ko'chasi 15",
+        lat: 40.3950,
+        lng: 71.7910,
+        pricePerHour: 150000,
+        rating: 4.8,
+        image: 'https://images.unsplash.com/photo-1551958219-acbc608c6377?auto=format&fit=crop&w=800&q=80',
+        facilities: ["Zamonaviy chim", "Kuchli projektor", "Muzdek ichimliklar", "Avtoturargoh"],
+        contactPerson: {
+          name: "Mamajonov Bekzod",
+          role: "Maydon ma'muri",
+          phone: "+998 93 440-12-34",
+          workHours: "08:00 - 01:00",
+          avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=200&q=80"
+        },
+        coords: { x: 55, y: 15 },
+        subscription: { plan: '3 oylik', status: 'active', daysLeft: 75, expiresAt: '2026-05-25' }
+      },
+      {
         id: 'v1',
         name: "14-sonli umumta'lim maktabi sport zali",
         type: 'school_gym',
@@ -126,6 +235,8 @@
         sport: 'Voleybol',
         village: 'Vodil',
         address: "Vodil qishlog'i, Mustaqillik ko'chasi 45-uy",
+        lat: 40.1805,
+        lng: 71.7262,
         pricePerHour: 100000,
         rating: 4.8,
         image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=800&q=80',
@@ -148,6 +259,8 @@
         sport: 'Futbol',
         village: 'Vodil',
         address: "Vodil dam olish xiyoboni bo'yi",
+        lat: 40.1748,
+        lng: 71.7330,
         pricePerHour: 160000,
         rating: 4.9,
         image: 'https://images.unsplash.com/photo-1529900748604-07564a03e7a6?auto=format&fit=crop&w=800&q=80',
@@ -170,6 +283,8 @@
         sport: 'Futbol',
         village: 'Yoshlarobod',
         address: "Yoshlarobod MFY markazi",
+        lat: 40.2355,
+        lng: 71.7120,
         pricePerHour: 120000,
         rating: 4.7,
         image: 'https://images.unsplash.com/photo-1518091043644-c1d4457512c6?auto=format&fit=crop&w=800&q=80',
@@ -192,6 +307,8 @@
         sport: 'Voleybol',
         village: 'Yoshlarobod',
         address: "Yoshlarobod, O'qituvchilar ko'chasi 12",
+        lat: 40.2280,
+        lng: 71.7050,
         pricePerHour: 80000,
         rating: 4.6,
         image: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=800&q=80',
@@ -214,6 +331,8 @@
         sport: 'Basketbol',
         village: 'Novkat',
         address: "Novkat QFY, 19-maktab binosi",
+        lat: 40.2115,
+        lng: 71.7640,
         pricePerHour: 90000,
         rating: 4.7,
         image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=800&q=80',
@@ -236,6 +355,8 @@
         sport: 'Futbol',
         village: 'Novkat',
         address: "Novkat, Kanal bo'yi",
+        lat: 40.2050,
+        lng: 71.7710,
         pricePerHour: 140000,
         rating: 4.9,
         image: 'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?auto=format&fit=crop&w=800&q=80',
@@ -254,18 +375,59 @@
 
     const INITIAL_GAMES = [
       {
+        id: 'g_fg1',
+        title: "Farg'ona Shahar Oqshom Voleybol Matchi",
+        sport: 'Voleybol',
+        venueId: 'v_fg2',
+        venueName: "Farg'ona Olimpiya Zaxiralari Voleybol va Basketbol Saroyi",
+        village: "Farg'ona",
+        lat: 40.3815,
+        lng: 71.7780,
+        date: "Bugun, 11-Sentabr",
+        time: "20:00 - 21:30",
+        isFree: false,
+        totalPrice: 130000,
+        maxPlayers: 12,
+        creator: "Qosimov Alisher (Admin)",
+        participants: [
+          { id: 'p_fg1', name: "Qosimov Alisher", phone: "+998 91 650-44-55", status: "To'langan", method: "Payme", avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=120&q=80" },
+          { id: 'p_fg2', name: "Javohir Ergashev", phone: "+998 90 220-33-44", status: "To'langan", method: "Click", avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80" }
+        ]
+      },
+      {
+        id: 'g_fg2',
+        title: "Farg'ona 'Istiqlol' Katta Futbol Matchi",
+        sport: 'Futbol',
+        venueId: 'v_fg1',
+        venueName: "Farg'ona 'Istiqlol' Markaziy Sport Majmuasi",
+        village: "Farg'ona",
+        lat: 40.3892,
+        lng: 71.7835,
+        date: "Ertaga, 12-Sentabr",
+        time: "19:00 - 20:30",
+        isFree: false,
+        totalPrice: 180000,
+        maxPlayers: 14,
+        creator: "Soliyev Olimjon (Admin)",
+        participants: [
+          { id: 'p_fg3', name: "Soliyev Olimjon", phone: "+998 90 160-22-33", status: "To'langan", method: "Click", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80" }
+        ]
+      },
+      {
         id: 'g1',
         title: "Vodil 14-maktab Oqshom Voleyboli",
         sport: 'Voleybol',
         venueId: 'v1',
         venueName: "14-maktab sport zali",
         village: "Vodil",
+        lat: 40.1805,
+        lng: 71.7262,
         date: "Bugun, 11-Sentabr",
         time: "19:30 - 21:00",
         isFree: false,
         totalPrice: 120000,
         maxPlayers: 12,
-        creator: "Azizbek Fayziyev",
+        creator: "Azizbek Fayziyev (Admin)",
         participants: [
           { id: 'p1', name: "Azizbek Fayziyev", phone: "+998 90 123-45-67", status: "To'langan", method: "Payme", avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80" },
           { id: 'p2', name: "Jasur Komilov", phone: "+998 91 334-11-22", status: "To'langan", method: "Click", avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=120&q=80" },
@@ -284,6 +446,8 @@
         venueId: 'v4',
         venueName: "8-sonli maktab sport zali",
         village: "Yoshlarobod",
+        lat: 40.2280,
+        lng: 71.7050,
         date: "Ertaga, 12-Sentabr",
         time: "18:00 - 19:30",
         isFree: true,
@@ -302,15 +466,36 @@
         venueId: 'v2',
         venueName: "Vodil Arena Sun'iy Maydoni",
         village: "Vodil",
+        lat: 40.1748,
+        lng: 71.7330,
         date: "Bugun, 11-Sentabr",
         time: "21:00 - 22:30",
         isFree: false,
         totalPrice: 160000,
         maxPlayers: 14,
-        creator: "Sarvar Usmonov",
+        creator: "Sarvar Usmonov (Admin)",
         participants: [
           { id: 'p10', name: "Sarvar Usmonov", phone: "+998 90 555-11-22", status: "To'langan", method: "Click", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80" },
           { id: 'p11', name: "Ulug'bek Tohirov", phone: "+998 91 223-34-45", status: "To'langan", method: "Payme", avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=120&q=80" }
+        ]
+      },
+      {
+        id: 'g_nk1',
+        title: "Novkat Star Mini-Futbol turniri",
+        sport: 'Futbol',
+        venueId: 'v6',
+        venueName: "Novkat Star Mini-Futbol Maydoni",
+        village: "Novkat",
+        lat: 40.2050,
+        lng: 71.7710,
+        date: "Bugun, 11-Sentabr",
+        time: "19:00 - 20:30",
+        isFree: false,
+        totalPrice: 140000,
+        maxPlayers: 10,
+        creator: "Karimov Otabek (Admin)",
+        participants: [
+          { id: 'p_nk1', name: "Karimov Otabek", phone: "+998 90 840-77-66", status: "To'langan", method: "Naqd", avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80" }
         ]
       }
     ];
@@ -329,6 +514,34 @@
       const [isSuperAdminModalOpen, setIsSuperAdminModalOpen] = useState(false);
       const [adminPasswordInput, setAdminPasswordInput] = useState('');
       const [adminPasswordError, setAdminPasswordError] = useState(false);
+
+      // ADMIN HUQUQLARI VA TO'LOV TIZIMI (MONETIZATSIYA)
+      const [isAdmin, setIsAdmin] = useState(() => localStorage.getItem('fs_is_admin') === 'true');
+      const [isAdminPaymentModalOpen, setIsAdminPaymentModalOpen] = useState(false);
+      const [ownerCard, setOwnerCard] = useState(() => localStorage.getItem('fs_owner_card') || '8600 **** **** ****');
+      const [ownerCardInput, setOwnerCardInput] = useState(() => localStorage.getItem('fs_owner_card') || '8600 **** **** ****');
+
+      // HAQIQIY XARITA HOLATI (LEAFLET / GOOGLE SATELLITE & STREET)
+      const [mapTileLayer, setMapTileLayer] = useState('satellite'); // 'satellite', 'street', 'dark'
+      const mapContainerRef = React.useRef(null);
+      const leafletMapInstanceRef = React.useRef(null);
+      const markersGroupRef = React.useRef(null);
+
+      // STEP 2 XARITA REF
+      const step2MapContainerRef = React.useRef(null);
+      const step2MapInstanceRef = React.useRef(null);
+      const step2MarkerRef = React.useRef(null);
+
+      // YANGI O'YIN OCHISH STATE
+      const [newGameTitleInput, setNewGameTitleInput] = useState('');
+      const [newGameSport, setNewGameSport] = useState('Voleybol');
+      const [newGameVillage, setNewGameVillage] = useState("Farg'ona");
+      const [newGameVenueId, setNewGameVenueId] = useState('v_fg2');
+      const [newGameIsFree, setNewGameIsFree] = useState(false);
+      const [newGameTotalPrice, setNewGameTotalPrice] = useState(130000);
+      const [newGameMaxPlayers, setNewGameMaxPlayers] = useState(12);
+      const [newGameDateInput, setNewGameDateInput] = useState('Bugun, 11-Sentabr');
+      const [newGameTimeInput, setNewGameTimeInput] = useState('20:00 - 21:30');
 
       // TELEFON RAQAMINI HAQIQIY EKANLIGINI TEKSHIRISH VA SMS KOD TIZIMI
       const [phoneDigits, setPhoneDigits] = useState(() => {
@@ -576,6 +789,265 @@
         setAnalytics(up);
         localStorage.setItem('fs_analytics', JSON.stringify(up));
       };
+
+      const canCreateGame = isSuperAdminUnlocked || currentRole === 'super_admin' || currentRole === 'hall_admin' || currentRole === 'admin' || isAdmin;
+
+      const handleOpenCreateGame = () => {
+        if (canCreateGame) {
+          // Adminlarga o'yin ochish cheklanmagan!
+          setIsCreateGameOpen(true);
+        } else {
+          // Admin bo'lmaganlarga cheklangan!
+          setIsAdminPaymentModalOpen(true);
+        }
+      };
+
+      const handleSelectVillage = (v) => {
+        setSelectedVillage(v);
+        if (leafletMapInstanceRef.current) {
+          if (v === 'Barchasi') {
+            leafletMapInstanceRef.current.flyTo([40.2850, 71.7500], 11, { duration: 1.2 });
+          } else if (v === "Farg'ona") {
+            leafletMapInstanceRef.current.flyTo([40.3864, 71.7864], 13, { duration: 1.2 });
+          } else if (v === 'Vodil') {
+            leafletMapInstanceRef.current.flyTo([40.1805, 71.7262], 13, { duration: 1.2 });
+          } else if (v === 'Yoshlarobod') {
+            leafletMapInstanceRef.current.flyTo([40.2355, 71.7120], 13, { duration: 1.2 });
+          } else if (v === 'Novkat') {
+            leafletMapInstanceRef.current.flyTo([40.2115, 71.7640], 13, { duration: 1.2 });
+          }
+        }
+      };
+
+      const focusVenueOnMap = (venue) => {
+        if (!venue) return;
+        setSelectedVenue(venue);
+        if (leafletMapInstanceRef.current && venue.lat && venue.lng) {
+          leafletMapInstanceRef.current.flyTo([venue.lat, venue.lng], 15, { duration: 1.2 });
+        }
+        showToast(`📍 ${venue.name} xaritada ko'rsatildi`);
+      };
+
+      // REAL LEAFLET GOOGLE SATELLITE / STREET MAP FOR STEP 3
+      useEffect(() => {
+        if (appStep !== 3 || activeTab !== 'home' || !window.L) return;
+
+        const timer = setTimeout(() => {
+          if (!mapContainerRef.current) return;
+
+          if (leafletMapInstanceRef.current) {
+            try { leafletMapInstanceRef.current.remove(); } catch(e){}
+            leafletMapInstanceRef.current = null;
+          }
+
+          try {
+            const map = window.L.map(mapContainerRef.current, {
+              center: [40.2850, 71.7500],
+              zoom: 11,
+              zoomControl: false
+            });
+
+            window.L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+            let tileUrl = 'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}';
+            let tileAttribution = 'Google Satellite';
+            if (mapTileLayer === 'street') {
+              tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+              tileAttribution = '© OpenStreetMap';
+            } else if (mapTileLayer === 'dark') {
+              tileUrl = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+              tileAttribution = '© CartoDB Dark';
+            }
+
+            window.L.tileLayer(tileUrl, {
+              maxZoom: 20,
+              attribution: tileAttribution
+            }).addTo(map);
+
+            const markersGroup = window.L.layerGroup().addTo(map);
+            markersGroupRef.current = markersGroup;
+
+            // Foydalanuvchi joyi
+            const userIconHtml = `
+              <div class="relative flex flex-col items-center">
+                <span class="w-8 h-8 rounded-full bg-emerald-400/40 animate-ping absolute -top-1"></span>
+                <div class="w-7 h-7 rounded-full bg-emerald-500 text-black flex items-center justify-center font-bold text-xs shadow-2xl border-2 border-white">
+                  📍
+                </div>
+              </div>
+            `;
+            const userDivIcon = window.L.divIcon({
+              html: userIconHtml,
+              className: 'custom-user-pin',
+              iconSize: [28, 28],
+              iconAnchor: [14, 28]
+            });
+            window.L.marker([40.1802, 71.7258], { icon: userDivIcon })
+              .bindTooltip("<b>Siz shu yerdasiz</b>", { permanent: false, direction: 'top' })
+              .addTo(markersGroup);
+
+            // Maydonlar va o'yinlar markerlari
+            venues.forEach(v => {
+              const vGames = games.filter(g => g.venueId === v.id);
+              const sportIcon = v.sport === 'Voleybol' ? '🏐' : v.sport === 'Futbol' ? '⚽' : '🏀';
+              const badgeBg = v.sport === 'Voleybol' ? 'bg-indigo-600' : v.sport === 'Futbol' ? 'bg-emerald-600' : 'bg-amber-600';
+
+              const markerHtml = `
+                <div class="relative flex flex-col items-center group cursor-pointer">
+                  <div class="w-10 h-10 rounded-2xl ${badgeBg} text-white flex items-center justify-center text-lg shadow-2xl border-2 border-white/90 transform transition-transform group-hover:scale-110">
+                    ${sportIcon}
+                  </div>
+                  <div class="mt-1 px-2 py-0.5 rounded-md bg-black/85 backdrop-blur-md text-white text-[9px] font-black whitespace-nowrap shadow border border-white/20">
+                    ${v.village} • ${vGames.length > 0 ? vGames.length + ' ta o\'yin' : 'Maydon'}
+                  </div>
+                </div>
+              `;
+
+              const customIcon = window.L.divIcon({
+                html: markerHtml,
+                className: 'custom-sport-pin',
+                iconSize: [40, 48],
+                iconAnchor: [20, 48]
+              });
+
+              const popupHtml = `
+                <div class="w-60 overflow-hidden rounded-2xl text-zinc-100 p-0 font-sans">
+                  <img src="${v.image}" class="w-full h-24 object-cover" />
+                  <div class="p-3 space-y-2">
+                    <div>
+                      <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">
+                        ${v.village} • ${v.sport}
+                      </span>
+                      <h4 class="font-black text-xs text-white mt-1 leading-tight">${v.name}</h4>
+                      <p class="text-[10px] text-zinc-400 mt-0.5">${v.address}</p>
+                    </div>
+                    <div class="flex items-center justify-between text-[11px] pt-1 border-t border-zinc-800">
+                      <span class="text-zinc-400">Ijara narxi:</span>
+                      <span class="font-black text-emerald-400">${v.pricePerHour.toLocaleString()} so'm/s</span>
+                    </div>
+                    <div class="pt-1 flex gap-1.5">
+                      <a href="https://www.google.com/maps/dir/?api=1&destination=${v.lat},${v.lng}" target="_blank" class="flex-1 py-1.5 px-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-black text-[10px] text-center flex items-center justify-center gap-1">
+                        🗺️ Google Maps Marshrut
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              `;
+
+              const marker = window.L.marker([v.lat, v.lng], { icon: customIcon })
+                .bindPopup(popupHtml)
+                .addTo(markersGroup);
+
+              marker.on('click', () => {
+                setSelectedVenue(v);
+              });
+            });
+
+            leafletMapInstanceRef.current = map;
+          } catch(err) {
+            console.error("Leaflet init error:", err);
+          }
+        }, 120);
+
+        return () => {
+          clearTimeout(timer);
+          if (leafletMapInstanceRef.current) {
+            try { leafletMapInstanceRef.current.remove(); } catch(e){}
+            leafletMapInstanceRef.current = null;
+          }
+        };
+      }, [appStep, activeTab, mapTileLayer, venues, games]);
+
+      // STEP 2 INTERACTIVE REAL MAP
+      useEffect(() => {
+        if (appStep !== 2 || !window.L) return;
+
+        const timer = setTimeout(() => {
+          if (!step2MapContainerRef.current) return;
+          if (step2MapInstanceRef.current) {
+            try { step2MapInstanceRef.current.remove(); } catch(e){}
+            step2MapInstanceRef.current = null;
+          }
+
+          try {
+            const map2 = window.L.map(step2MapContainerRef.current, {
+              center: [40.1802, 71.7258],
+              zoom: 13,
+              zoomControl: true
+            });
+
+            window.L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+              maxZoom: 20,
+              attribution: 'Google Satellite'
+            }).addTo(map2);
+
+            const userIconHtml = `
+              <div class="w-9 h-9 rounded-full bg-emerald-500 text-black flex items-center justify-center font-bold text-sm shadow-2xl border-2 border-white">
+                📍
+              </div>
+            `;
+            const divIcon = window.L.divIcon({
+              html: userIconHtml,
+              iconSize: [36, 36],
+              iconAnchor: [18, 36]
+            });
+
+            const marker = window.L.marker([40.1802, 71.7258], {
+              draggable: true,
+              icon: divIcon
+            }).addTo(map2);
+            step2MarkerRef.current = marker;
+
+            const updatePos = (lat, lng) => {
+              const villages = [
+                { name: "Farg'ona", lat: 40.3864, lng: 71.7864 },
+                { name: 'Vodil', lat: 40.1802, lng: 71.7258 },
+                { name: 'Yoshlarobod', lat: 40.2350, lng: 71.7100 },
+                { name: 'Novkat', lat: 40.2100, lng: 71.7650 }
+              ];
+              let nearest = 'Vodil';
+              let minDist = Infinity;
+              villages.forEach(v => {
+                const dist = Math.hypot(v.lat - lat, v.lng - lng);
+                if (dist < minDist) {
+                  minDist = dist;
+                  nearest = v.name;
+                }
+              });
+
+              setUserProfile(p => ({
+                ...p,
+                village: nearest,
+                userCoords: { lat, lng, x: 50, y: 70 }
+              }));
+              showToast(`Joylashuv belgilandi: ${nearest}`);
+            };
+
+            marker.on('dragend', (e) => {
+              const { lat, lng } = e.target.getLatLng();
+              updatePos(lat, lng);
+            });
+
+            map2.on('click', (e) => {
+              const { lat, lng } = e.latlng;
+              marker.setLatLng([lat, lng]);
+              updatePos(lat, lng);
+            });
+
+            step2MapInstanceRef.current = map2;
+          } catch(e) {
+            console.error(e);
+          }
+        }, 120);
+
+        return () => {
+          clearTimeout(timer);
+          if (step2MapInstanceRef.current) {
+            try { step2MapInstanceRef.current.remove(); } catch(e){}
+            step2MapInstanceRef.current = null;
+          }
+        };
+      }, [appStep]);
 
       const handleAdminPasswordSubmit = (e) => {
         e.preventDefault();
@@ -906,6 +1378,7 @@
                     defaultValue={userProfile.village}
                     className={`w-full px-3 py-2.5 rounded-xl border ${isDark ? 'bg-zinc-950 border-zinc-800' : 'bg-zinc-50 border-zinc-300'} font-semibold`}
                   >
+                    <option value="Farg'ona">Farg'ona</option>
                     <option value="Vodil">Vodil</option>
                     <option value="Yoshlarobod">Yoshlarobod</option>
                     <option value="Novkat">Novkat</option>
@@ -988,18 +1461,25 @@
 
                 <div className="flex items-center gap-2">
                   {[
-                    { name: 'Yoshlarobod', x: 26, y: 38 },
-                    { name: 'Vodil', x: 50, y: 72 },
-                    { name: 'Novkat', x: 75, y: 48 }
+                    { name: "Farg'ona", lat: 40.3864, lng: 71.7864 },
+                    { name: 'Vodil', lat: 40.1802, lng: 71.7258 },
+                    { name: 'Yoshlarobod', lat: 40.2350, lng: 71.7100 },
+                    { name: 'Novkat', lat: 40.2100, lng: 71.7650 }
                   ].map(v => (
                     <button
                       key={v.name}
                       onClick={() => {
-                        setUserProfile(p => ({ ...p, village: v.name, userCoords: { x: v.x, y: v.y } }));
+                        setUserProfile(p => ({ ...p, village: v.name, userCoords: { lat: v.lat, lng: v.lng, x: 50, y: 70 } }));
+                        if (step2MapInstanceRef.current) {
+                          step2MapInstanceRef.current.flyTo([v.lat, v.lng], 14, { duration: 1 });
+                          if (step2MarkerRef.current) {
+                            step2MarkerRef.current.setLatLng([v.lat, v.lng]);
+                          }
+                        }
                         showToast(`Joylashuv: ${v.name}`);
                       }}
-                      className={`flex-1 py-1.5 rounded-xl text-xs font-bold border ${
-                        userProfile.village === v.name ? 'bg-emerald-500 text-black' : isDark ? 'bg-zinc-950 border-zinc-800 text-zinc-300' : 'bg-zinc-100 border-zinc-200'
+                      className={`flex-1 py-2 rounded-xl text-xs font-bold border transition-all ${
+                        userProfile.village === v.name ? 'bg-emerald-500 text-black shadow' : isDark ? 'bg-zinc-950 border-zinc-800 text-zinc-300' : 'bg-zinc-100 border-zinc-200'
                       }`}
                     >
                       {v.name}
@@ -1007,31 +1487,11 @@
                   ))}
                 </div>
 
-                <div
-                  onClick={(e) => {
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    const x = Math.round(((e.clientX - rect.left) / rect.width) * 100);
-                    const y = Math.round(((e.clientY - rect.top) / rect.height) * 100);
-                    let vName = "Vodil";
-                    if (x < 35) vName = "Yoshlarobod";
-                    else if (x > 65) vName = "Novkat";
-                    setUserProfile(p => ({ ...p, userCoords: { x, y }, village: vName }));
-                    showToast(`Belgilandi: ${vName}`);
-                  }}
-                  className={`relative w-full h-64 rounded-2xl border ${isDark ? 'border-zinc-800 bg-zinc-950' : 'border-zinc-300 bg-zinc-100'} overflow-hidden cursor-crosshair`}
-                >
-                  <svg className="absolute inset-0 w-full h-full">
-                    <path d="M 120 0 Q 180 80 200 140 T 260 280" fill="none" stroke="#06b6d4" strokeWidth="8" strokeOpacity="0.6" strokeLinecap="round" />
-                    <path d="M 80 30 L 190 130 L 250 250" fill="none" stroke="#52525b" strokeWidth="3" strokeDasharray="4,4" />
-                  </svg>
-                  <div className="absolute top-4 left-4 text-[10px] font-bold text-emerald-400 bg-black/70 px-2 py-0.5 rounded">Yoshlarobod</div>
-                  <div className="absolute bottom-4 left-1/3 text-[10px] font-bold text-cyan-400 bg-black/70 px-2 py-0.5 rounded">Vodil</div>
-                  <div className="absolute top-4 right-4 text-[10px] font-bold text-purple-400 bg-black/70 px-2 py-0.5 rounded">Novkat</div>
-
-                  <div style={{ left: `${userProfile.userCoords.x}%`, top: `${userProfile.userCoords.y}%` }} className="absolute -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-                    <div className="w-8 h-8 rounded-full bg-emerald-500 text-black flex items-center justify-center font-bold text-xs shadow-2xl border-2 border-white">
-                      📍
-                    </div>
+                {/* Haqiqiy Google Satellite xarita konteyneri */}
+                <div className="relative w-full h-72 rounded-2xl border border-zinc-800 overflow-hidden shadow-inner bg-zinc-950">
+                  <div ref={step2MapContainerRef} className="w-full h-full z-10" />
+                  <div className="absolute bottom-2 left-2 z-20 px-2.5 py-1 rounded-lg bg-black/80 backdrop-blur-md text-[10px] text-zinc-300 border border-white/10 pointer-events-none">
+                    Xarita ustiga bosing yoki 📍 belgini suring
                   </div>
                 </div>
 
@@ -1093,125 +1553,67 @@
 
                 {activeTab === 'home' && (
                   <>
-                    {/* 3D XARITA */}
-                    <div className={`relative rounded-3xl overflow-hidden border ${cardBg} p-4 sm:p-5 shadow-2xl space-y-4`}>
+                    {/* ASOSIY HAQIQIY GOOGLE SATELLITE VA STREET XARITA BLOKI */}
+                    <div className={`relative rounded-3xl overflow-hidden border ${cardBg} p-4 sm:p-5 shadow-2xl space-y-3`}>
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                        <div className="flex items-center gap-2">
-                          <div className="p-2 rounded-xl bg-emerald-500 text-black font-black">
-                            <CompassIcon className="w-4 h-4" />
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h2 className="text-sm sm:text-base font-black flex items-center gap-1.5">
+                              <span>🗺️ Real Interaktiv Xarita</span>
+                              <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-wider">
+                                Haqiqiy Geofazoviy
+                              </span>
+                            </h2>
                           </div>
-                          <div>
-                            <h2 className="text-sm sm:text-base font-black">Farg'ona tumani 3D Sport Xaritasi</h2>
-                            <p className="text-xs text-zinc-400">Yoshlarobod, Vodil va Novkat sport maydonlari</p>
-                          </div>
+                          <p className="text-xs text-zinc-400">
+                            Farg'ona tumani: Vodil, Yoshlarobod, Novkat sport majmualari
+                          </p>
                         </div>
 
-                        <div className="flex items-center gap-2">
+                        {/* Xarita qatlamlari: Google Satellite / Street / Dark */}
+                        <div className="flex items-center gap-1.5 self-start sm:self-auto bg-zinc-900/90 p-1 rounded-xl border border-zinc-800">
                           <button
-                            onClick={() => setIs3DMapMode(!is3DMapMode)}
-                            className={`px-3 py-1.5 rounded-xl text-xs font-bold border flex items-center gap-1 ${
-                              is3DMapMode ? 'bg-emerald-500 text-black border-emerald-400' : isDark ? 'bg-zinc-800 text-zinc-300' : 'bg-zinc-100 text-zinc-800'
+                            onClick={() => setMapTileLayer('satellite')}
+                            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
+                              mapTileLayer === 'satellite' ? 'bg-emerald-500 text-black shadow' : 'text-zinc-400 hover:text-zinc-200'
                             }`}
                           >
-                            <LayersIcon className="w-3.5 h-3.5" />
-                            {is3DMapMode ? "3D Rejim (Faol)" : "2D Rejim"}
+                            <span>🛰️ Sun'iy yo'ldosh</span>
                           </button>
-                          {is3DMapMode && (
-                            <button
-                              onClick={() => setMapRotation(p => ({ ...p, z: p.z === -20 ? 10 : -20 }))}
-                              className="px-2.5 py-1.5 rounded-xl bg-zinc-800 text-zinc-200 text-xs font-bold border border-zinc-700 flex items-center gap-1"
-                            >
-                              <RefreshCwIcon className="w-3.5 h-3.5" /> Burish
-                            </button>
-                          )}
+                          <button
+                            onClick={() => setMapTileLayer('street')}
+                            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
+                              mapTileLayer === 'street' ? 'bg-emerald-500 text-black shadow' : 'text-zinc-400 hover:text-zinc-200'
+                            }`}
+                          >
+                            <span>🗺️ Ko'cha</span>
+                          </button>
+                          <button
+                            onClick={() => setMapTileLayer('dark')}
+                            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
+                              mapTileLayer === 'dark' ? 'bg-emerald-500 text-black shadow' : 'text-zinc-400 hover:text-zinc-200'
+                            }`}
+                          >
+                            <span>🌙 Tungi</span>
+                          </button>
                         </div>
                       </div>
 
-                      {/* 3D SATH */}
-                      <div
-                        style={{ perspective: '1100px' }}
-                        className={`relative w-full h-80 sm:h-96 rounded-2xl overflow-hidden border ${isDark ? 'border-zinc-800 bg-[#06080e]' : 'border-zinc-300 bg-slate-100'} select-none flex items-center justify-center`}
-                      >
-                        <div
-                          style={{
-                            transform: is3DMapMode ? `rotateX(${mapRotation.x}deg) rotateZ(${mapRotation.z}deg) scale(0.95)` : 'none',
-                            transformStyle: 'preserve-3d',
-                            transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)'
-                          }}
-                          className="relative w-[92%] h-[88%] rounded-3xl bg-gradient-to-br from-emerald-950/40 via-zinc-900 to-zinc-950 border-2 border-emerald-500/30 shadow-2xl overflow-hidden"
-                        >
-                          <div className="absolute inset-0 opacity-40 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:18px_18px]" />
-                          <svg className="absolute inset-0 w-full h-full pointer-events-none">
-                            <path d="M 140 -20 Q 200 80 230 160 T 300 320" fill="none" stroke="#06b6d4" strokeWidth="12" strokeLinecap="round" strokeOpacity="0.8" />
-                            <path d="M 80 10 L 210 140 L 270 280" fill="none" stroke="#64748b" strokeWidth="4" strokeDasharray="5,5" />
-                            <path d="M 210 140 L 440 150" fill="none" stroke="#64748b" strokeWidth="4" strokeDasharray="5,5" />
-                          </svg>
+                      {/* LEAFLET CONTAINER */}
+                      <div className="relative w-full h-80 sm:h-96 rounded-2xl overflow-hidden border border-zinc-800 shadow-2xl bg-zinc-950">
+                        <div ref={mapContainerRef} className="w-full h-full z-10" />
 
-                          <div className="absolute top-4 left-6 text-xs font-black uppercase text-emerald-300 bg-zinc-900/90 px-2.5 py-1 rounded-lg border border-emerald-500/40 shadow">
-                            Yoshlarobod
-                          </div>
-                          <div className="absolute bottom-6 left-1/3 text-xs font-black uppercase text-cyan-300 bg-zinc-900/90 px-2.5 py-1 rounded-lg border border-cyan-500/40 shadow">
-                            Vodil Soya Bo'yi
-                          </div>
-                          <div className="absolute top-6 right-6 text-xs font-black uppercase text-purple-300 bg-zinc-900/90 px-2.5 py-1 rounded-lg border border-purple-500/40 shadow">
-                            Novkat
-                          </div>
-
-                          {/* Siz bu yerdasiz */}
-                          <div style={{ left: `${userProfile.userCoords.x}%`, top: `${userProfile.userCoords.y}%` }} className="absolute -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none">
-                            <div className="relative flex flex-col items-center">
-                              <span className="w-10 h-10 rounded-full bg-emerald-400/30 animate-ping absolute -top-1" />
-                              <div className="w-7 h-7 rounded-full bg-emerald-500 text-black flex items-center justify-center font-bold text-xs shadow-2xl border-2 border-white">
-                                📍
-                              </div>
-                              <span className="bg-black/90 text-emerald-300 text-[9px] font-black px-1.5 py-0.5 rounded-full border border-emerald-500 mt-0.5">
-                                Siz shu yerdasiz
-                              </span>
-                            </div>
-                          </div>
-
-                          {/* 3D Maydonlar */}
-                          {venues.map(v => {
-                            const isGym = v.type === 'school_gym';
-                            const isBasket = v.type === 'basketball_court';
-                            const isSel = selectedVenue?.id === v.id;
-                            return (
-                              <div
-                                key={v.id}
-                                onClick={() => setSelectedVenue(v)}
-                                style={{ left: `${v.coords.x}%`, top: `${v.coords.y}%` }}
-                                className="absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer z-20 group"
-                              >
-                                <div className="relative flex flex-col items-center">
-                                  <div className="w-8 h-4 bg-black/50 rounded-full blur-[2px] -mb-1" />
-                                  <div className={`transition-all transform group-hover:-translate-y-2 ${isSel ? '-translate-y-3 ring-4 ring-white' : ''}`}>
-                                    {isGym ? (
-                                      <div className="w-12 h-9 rounded-lg bg-indigo-900 border-2 border-indigo-400 flex flex-col items-center justify-center text-white shadow-xl">
-                                        <span className="text-xs">🏫</span>
-                                        <span className="text-[7px] font-black text-indigo-200">ZAL</span>
-                                      </div>
-                                    ) : isBasket ? (
-                                      <div className="w-12 h-9 rounded-lg bg-amber-900 border-2 border-amber-400 flex flex-col items-center justify-center text-white shadow-xl">
-                                        <span className="text-xs">🏀</span>
-                                        <span className="text-[7px] font-black text-amber-200">BASKET</span>
-                                      </div>
-                                    ) : (
-                                      <div className="w-12 h-9 rounded-lg bg-emerald-900 border-2 border-emerald-400 flex flex-col items-center justify-center text-white shadow-xl">
-                                        <span className="text-xs">⚽</span>
-                                        <span className="text-[7px] font-black text-emerald-200">CHIM</span>
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          })}
+                        {/* Xarita ustidagi mini panel */}
+                        <div className="absolute top-3 left-3 z-20 flex items-center gap-1.5 pointer-events-none">
+                          <span className="px-2.5 py-1 rounded-lg bg-black/80 backdrop-blur-md text-emerald-400 text-[11px] font-black border border-white/10 shadow">
+                            🟢 {venues.length} ta Sport Majmuasi
+                          </span>
                         </div>
                       </div>
 
                       {/* Tanlangan maydon kartasi */}
                       {selectedVenue && (
-                        <div className={`p-3.5 rounded-2xl border ${cardBg} flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-fadeIn`}>
+                        <div className={`p-3.5 rounded-2xl border ${cardBg} flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-fadeIn shadow-lg`}>
                           <div className="flex items-center gap-3">
                             <img src={selectedVenue.image} alt={selectedVenue.name} className="w-14 h-14 rounded-xl object-cover" />
                             <div>
@@ -1221,10 +1623,17 @@
                             </div>
                           </div>
                           <div className="flex items-center gap-2 w-full sm:w-auto">
+                            <a
+                              href={`https://www.google.com/maps/dir/?api=1&destination=${selectedVenue.lat},${selectedVenue.lng}`}
+                              target="_blank"
+                              className="flex-1 sm:flex-none px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-bold flex items-center justify-center gap-1"
+                            >
+                              🗺️ Google Maps Marshrut
+                            </a>
                             <button onClick={() => setIsCallModalOpen(selectedVenue.contactPerson)} className="flex-1 sm:flex-none px-3 py-1.5 rounded-xl bg-zinc-800 text-xs font-bold flex items-center justify-center gap-1">
                               <PhoneIcon className="w-3.5 h-3.5 text-emerald-400" /> Qo'ng'iroq
                             </button>
-                            <button onClick={() => { setSelectedVillage(selectedVenue.village); showToast(`${selectedVenue.village} saralandi`); }} className="flex-1 sm:flex-none px-3.5 py-1.5 rounded-xl bg-emerald-500 text-black text-xs font-extrabold">
+                            <button onClick={() => { setSelectedVillage(selectedVenue.village); showToast(`${selectedVenue.village} o'yinlari saralandi`); }} className="flex-1 sm:flex-none px-3.5 py-1.5 rounded-xl bg-emerald-500 text-black text-xs font-extrabold">
                               O'yinlarini ko'rish
                             </button>
                           </div>
@@ -1237,12 +1646,12 @@
                       <div className="flex items-center justify-between">
                         <h3 className="text-base font-black">Sport turini tanlang:</h3>
                         <div className="flex items-center gap-1">
-                          {['Barchasi', 'Yoshlarobod', 'Vodil', 'Novkat'].map(v => (
+                          {['Barchasi', "Farg'ona", 'Vodil', 'Yoshlarobod', 'Novkat'].map(v => (
                             <button
                               key={v}
-                              onClick={() => setSelectedVillage(v)}
-                              className={`px-2.5 py-1 rounded-xl text-xs font-bold ${
-                                selectedVillage === v ? 'bg-emerald-500 text-black' : isDark ? 'bg-zinc-900 text-zinc-400' : 'bg-white text-zinc-600'
+                              onClick={() => handleSelectVillage(v)}
+                              className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-all ${
+                                selectedVillage === v ? 'bg-emerald-500 text-black shadow' : isDark ? 'bg-zinc-900 text-zinc-400' : 'bg-white text-zinc-600'
                               }`}
                             >
                               {v}
@@ -1287,12 +1696,28 @@
                           <p className="text-xs text-zinc-400">Tafsilotlar va to'lov hisoblagichini ko'rish uchun bosing</p>
                         </div>
 
-                        <button
-                          onClick={() => setIsCreateGameOpen(true)}
-                          className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black text-xs font-extrabold flex items-center gap-1 shadow"
-                        >
-                          <PlusIcon className="w-4 h-4" /> O'yin ochish
-                        </button>
+                        <div className="flex items-center gap-2">
+                          {canCreateGame ? (
+                            <span className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-[11px] font-black text-emerald-400">
+                              🛡️ Admin: Cheklanmagan
+                            </span>
+                          ) : (
+                            <span className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/30 text-[11px] font-black text-amber-400">
+                              🔒 O'yin ochish: Admin kerak
+                            </span>
+                          )}
+                          <button
+                            onClick={handleOpenCreateGame}
+                            className={`px-3.5 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5 shadow-md transition-all ${
+                              canCreateGame
+                                ? 'bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-black'
+                                : 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black'
+                            }`}
+                          >
+                            <PlusIcon className="w-4 h-4" />
+                            <span>{canCreateGame ? "O'yin ochish" : "O'yin ochish (Admin)"}</span>
+                          </button>
+                        </div>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
@@ -1331,9 +1756,21 @@
 
                               <div className="flex items-center justify-between text-xs pt-1">
                                 <span className="text-emerald-400 font-bold">{game.participants.length}/{game.maxPlayers} ta o'yinchi ({freeSpots} bo'sh)</span>
-                                <button className="px-2.5 py-1 rounded-lg bg-zinc-800 text-xs font-bold flex items-center gap-1">
-                                  Tafsilotlar <ChevronRightIcon className="w-3.5 h-3.5" />
-                                </button>
+                                <div className="flex items-center gap-1.5">
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      const v = venues.find(ven => ven.id === game.venueId);
+                                      if (v) focusVenueOnMap(v);
+                                    }}
+                                    className="px-2 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500 hover:text-black text-emerald-400 border border-emerald-500/30 text-[11px] font-bold flex items-center gap-1 transition-colors"
+                                  >
+                                    📍 Xaritada
+                                  </button>
+                                  <button className="px-2 py-1 rounded-lg bg-zinc-800 text-xs font-bold flex items-center gap-1">
+                                    Tafsilotlar <ChevronRightIcon className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
                               </div>
                             </div>
                           );
@@ -1634,6 +2071,66 @@
                         ))}
                       </div>
                     </div>
+
+                    {/* MENING BANK KARTAM (ADMIN TO'LOVLARI TUSHADIGAN KARTA) */}
+                    <div className={`p-4 sm:p-5 rounded-2xl border ${cardBg} space-y-3.5 shadow-lg`}>
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div>
+                          <h4 className="text-sm font-black uppercase tracking-wide text-cyan-400 flex items-center gap-2">
+                            <span>💳 Mening bank kartam (Admin to'lovlari tushadigan karta)</span>
+                          </h4>
+                          <p className="text-xs text-zinc-400 mt-0.5">
+                            Foydalanuvchilar o'yin ochish huquqi (Admin litsenziyasi) uchun to'lov qilganda ushbu kartaga pul tushadi
+                          </p>
+                        </div>
+                        <span className="text-[10px] font-black uppercase px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                          To'lov qabul qilish faol
+                        </span>
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                        <input
+                          type="text"
+                          value={ownerCardInput}
+                          onChange={(e) => setOwnerCardInput(e.target.value)}
+                          placeholder="8600 1234 5678 9012"
+                          className="flex-1 px-4 py-2.5 rounded-xl bg-zinc-950 border border-zinc-700 font-mono text-sm text-emerald-400 font-bold focus:outline-none focus:border-emerald-500"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setOwnerCard(ownerCardInput);
+                            localStorage.setItem('fs_owner_card', ownerCardInput);
+                            showToast("✅ Bank karta raqamingiz muvaffaqiyatli saqlandi!");
+                          }}
+                          className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs shadow-md transition-all shrink-0"
+                        >
+                          Kartani saqlash
+                        </button>
+                      </div>
+
+                      <div className="p-3 rounded-xl bg-zinc-950/60 border border-zinc-800 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                        <div>
+                          <span className="text-zinc-500">Ilovada ko'rinadigan faol karta: </span>
+                          <span className="font-mono font-black text-emerald-400">{ownerCard}</span>
+                          {ownerCard.includes('*') && (
+                            <span className="text-amber-400 text-[11px] block mt-0.5">
+                              ⚠️ (Karta raqami admin tomonidan tez orada kiritiladi)
+                            </span>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => {
+                            setIsAdmin(!isAdmin);
+                            localStorage.setItem('fs_is_admin', (!isAdmin).toString());
+                            showToast(isAdmin ? "Admin huquqi o'chirildi" : "Admin huquqi yoqildi!");
+                          }}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold border ${isAdmin ? 'bg-amber-500/10 text-amber-400 border-amber-500/30' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'}`}
+                        >
+                          {isAdmin ? "Admin huquqini sinov uchun o'chirish" : "O'zimga Admin huquqini berish"}
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 )}
 
@@ -1880,59 +2377,336 @@
             </div>
           )}
 
-          {/* YANGI O'YIN MODALI */}
+          {/* ODDİY FOYDALANUVCHILAR UCHUN CHEKLOV VA ADMIN HUQUQINI SOTIB OLISH MODALI */}
+          {isAdminPaymentModalOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
+              <div className="w-full max-w-md rounded-3xl bg-zinc-900 border border-zinc-800 p-6 space-y-4 shadow-2xl text-zinc-100">
+                <div className="flex items-center justify-between pb-3 border-b border-zinc-800">
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-lg">
+                      🔒
+                    </span>
+                    <div>
+                      <h3 className="text-sm font-black text-white">O'yin ochish cheklangan!</h3>
+                      <p className="text-[11px] text-zinc-400">Faqat rasmiy Adminlar uchun ruxsat etilgan</p>
+                    </div>
+                  </div>
+                  <button onClick={() => setIsAdminPaymentModalOpen(false)} className="text-zinc-400 hover:text-white p-1">✕</button>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 space-y-1">
+                  <p className="font-bold">⚠️ Hurmatli foydalanuvchi!</p>
+                  <p className="text-[11px] leading-relaxed text-amber-200/90">
+                    Platformamizda xavfsizlik va tartibni saqlash maqsadida oddiy foydalanuvchilarga o'yin e'lon qilish cheklangan. 
+                    O'yin tashkil qilish huquqi faqat <b>tasdiqlangan Adminlar uchun cheklanmagan</b>.
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <h4 className="text-xs font-black uppercase text-zinc-400">Admin bo'lish va cheksiz o'yin ochish:</h4>
+                  <div className="p-3.5 rounded-2xl bg-zinc-950 border border-zinc-800 space-y-2.5 text-xs">
+                    <div className="flex justify-between items-center">
+                      <span className="text-zinc-400">Tashkilotchi admin to'lovi:</span>
+                      <span className="font-black text-emerald-400 text-sm">50 000 so'm / oy</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-zinc-400">Imtiyoz:</span>
+                      <span className="font-bold text-white">Cheksiz o'yinlar tashkil qilish</span>
+                    </div>
+                    <div className="pt-2 border-t border-zinc-800 space-y-1">
+                      <span className="text-[11px] text-zinc-400 block">To'lov tushadigan admin kartasi:</span>
+                      <div className="flex items-center justify-between p-2.5 rounded-xl bg-zinc-900 border border-zinc-700 font-mono font-bold text-emerald-400">
+                        <span className="tracking-wider">{ownerCard}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(ownerCard.replace(/\s/g, ''));
+                            showToast("Karta raqami nusxalandi!");
+                          }}
+                          className="px-2 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-[10px] text-zinc-300 font-sans"
+                        >
+                          Nusxa olish
+                        </button>
+                      </div>
+                      {ownerCard.includes('*') && (
+                        <p className="text-[10px] text-amber-400 pt-0.5">
+                          (Karta raqami admin tomonidan tez orada kiritiladi. Aloqa: +998 90 555-14-22)
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2 pt-1">
+                  <p className="text-[11px] text-zinc-400 text-center">
+                    Admin kartasiga 50 000 so'm to'lov qilib, quyidagi tugmani bosing:
+                  </p>
+                  <button
+                    onClick={() => {
+                      setIsAdmin(true);
+                      localStorage.setItem('fs_is_admin', 'true');
+                      setIsAdminPaymentModalOpen(false);
+                      setIsCreateGameOpen(true);
+                      showToast("🎉 Tabriklaymiz! Sizga cheksiz o'yin ochish Admin huquqi berildi!");
+                    }}
+                    className="w-full py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-black font-black text-xs shadow-lg transition-all flex items-center justify-center gap-1.5"
+                  >
+                    <span>✅ To'lov qildim, Admin huquqini faollashtirish</span>
+                  </button>
+                  <button
+                    onClick={() => setIsAdminPaymentModalOpen(false)}
+                    className="w-full py-2 rounded-xl bg-zinc-800 text-zinc-300 text-xs font-bold"
+                  >
+                    Yopish
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* YANGI O'YIN TASHKIL QILISH (ADMINLAR UCHUN CHEKLANMAGAN) */}
           {isCreateGameOpen && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
-              <div className="w-full max-w-md rounded-3xl bg-zinc-900 border border-zinc-800 p-5 space-y-3 text-zinc-100">
-                <div className="flex justify-between pb-2 border-b border-zinc-800">
-                  <h3 className="text-sm font-bold">Yangi o'yin ochish</h3>
-                  <button onClick={() => setIsCreateGameOpen(false)}>✕</button>
+              <div className="w-full max-w-lg max-h-[92vh] overflow-y-auto rounded-3xl bg-zinc-900 border border-zinc-800 p-5 sm:p-6 space-y-4 shadow-2xl text-zinc-100">
+                <div className="flex items-center justify-between pb-3 border-b border-zinc-800">
+                  <div className="flex items-center gap-2">
+                    <span className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-lg">
+                      🛡️
+                    </span>
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <h3 className="text-base font-black text-white">Yangi O'yin Ochish</h3>
+                        <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">
+                          Admin Huquqi
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-zinc-400">Farg'ona, Vodil, Yoshlarobod, Novkat sport majmualarida</p>
+                    </div>
+                  </div>
+                  <button onClick={() => setIsCreateGameOpen(false)} className="text-zinc-400 hover:text-white p-1">✕</button>
                 </div>
+
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
-                    const fd = new FormData(e.currentTarget);
+                    const chosenVenue = venues.find(v => v.id === newGameVenueId) || venues[0];
+                    const finalTitle = newGameTitleInput || `${chosenVenue.village} ${newGameSport} Do'stona O'yini`;
                     const newG = {
                       id: 'g_' + Date.now(),
-                      title: fd.get('title') || "Do'stona Voleybol o'yini",
-                      sport: fd.get('sport') || 'Voleybol',
-                      venueId: 'v1',
-                      venueName: "14-maktab sport zali",
-                      village: fd.get('village') || 'Vodil',
-                      date: "Bugun",
-                      time: fd.get('time') || "20:00 - 21:30",
-                      isFree: fd.get('isFree') === 'free',
-                      totalPrice: fd.get('isFree') === 'free' ? 0 : 120000,
-                      maxPlayers: parseInt(fd.get('maxPlayers') || '12'),
-                      level: "O'rta daraja",
-                      creator: userProfile.name,
+                      title: finalTitle,
+                      sport: newGameSport,
+                      venueId: chosenVenue.id,
+                      venueName: chosenVenue.name,
+                      village: chosenVenue.village,
+                      lat: chosenVenue.lat,
+                      lng: chosenVenue.lng,
+                      date: newGameDateInput || "Bugun",
+                      time: newGameTimeInput || "20:00 - 21:30",
+                      isFree: newGameIsFree,
+                      totalPrice: newGameIsFree ? 0 : Number(newGameTotalPrice),
+                      maxPlayers: Number(newGameMaxPlayers),
+                      level: "Barcha darajalar",
+                      creator: `${userProfile.name} (Admin)`,
                       participants: [
-                        { id: 'p_creator', name: userProfile.name, phone: userProfile.phone, status: "To'langan", method: "Payme", avatar: userProfile.avatar }
+                        {
+                          id: 'p_creator_' + Date.now(),
+                          name: userProfile.name,
+                          phone: userProfile.phone,
+                          status: "To'langan",
+                          method: newGameIsFree ? "Bepul" : "Admin",
+                          avatar: userProfile.avatar
+                        }
                       ]
                     };
-                    setGames(p => [newG, ...p]);
+
+                    setGames(prev => [newG, ...prev]);
                     setIsCreateGameOpen(false);
-                    showToast("Yangi o'yin e'loni qo'shildi!");
+                    focusVenueOnMap(chosenVenue);
+                    showToast(`🎉 "${newG.title}" o'yini e'lon qilindi va xaritada ko'rsatildi!`);
                   }}
-                  className="space-y-3 text-xs"
+                  className="space-y-4 text-xs"
                 >
-                  <input name="title" defaultValue="Do'stona Voleybol o'yini" required className="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800" />
-                  <div className="grid grid-cols-2 gap-2">
-                    <select name="sport" defaultValue={selectedSport} className="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800">
-                      <option value="Voleybol">Voleybol</option>
-                      <option value="Futbol">Futbol</option>
-                      <option value="Basketbol">Basketbol</option>
-                    </select>
-                    <select name="village" defaultValue="Vodil" className="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800">
-                      <option value="Yoshlarobod">Yoshlarobod</option>
-                      <option value="Vodil">Vodil</option>
-                      <option value="Novkat">Novkat</option>
+                  {/* O'yin nomi */}
+                  <div>
+                    <label className="text-zinc-300 font-bold block mb-1">O'yin nomi / Sarlavha:</label>
+                    <input
+                      type="text"
+                      value={newGameTitleInput}
+                      onChange={(e) => setNewGameTitleInput(e.target.value)}
+                      placeholder="Masalan: Farg'ona Olimpiya Zali Voleybol Oqshomi"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-white font-semibold focus:outline-none focus:border-emerald-500"
+                    />
+                  </div>
+
+                  {/* Sport turi va Hudud */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-zinc-300 font-bold block mb-1">Sport turi:</label>
+                      <select
+                        value={newGameSport}
+                        onChange={(e) => {
+                          const s = e.target.value;
+                          setNewGameSport(s);
+                          const matching = venues.find(v => (v.sport === s || v.category.includes(s)) && v.village === newGameVillage);
+                          if (matching) {
+                            setNewGameVenueId(matching.id);
+                            setNewGameTotalPrice(matching.pricePerHour);
+                          }
+                        }}
+                        className="w-full px-3 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-white font-bold"
+                      >
+                        <option value="Voleybol">🏐 Voleybol</option>
+                        <option value="Futbol">⚽ Futbol</option>
+                        <option value="Basketbol">🏀 Basketbol</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="text-zinc-300 font-bold block mb-1">Hudud (Qishloq/Shahar):</label>
+                      <select
+                        value={newGameVillage}
+                        onChange={(e) => {
+                          const vil = e.target.value;
+                          setNewGameVillage(vil);
+                          const matching = venues.find(v => (v.sport === newGameSport || v.category.includes(newGameSport)) && v.village === vil) || venues.find(v => v.village === vil);
+                          if (matching) {
+                            setNewGameVenueId(matching.id);
+                            setNewGameTotalPrice(matching.pricePerHour);
+                          }
+                        }}
+                        className="w-full px-3 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-white font-bold"
+                      >
+                        <option value="Farg'ona">🏢 Farg'ona shahri</option>
+                        <option value="Vodil">🌲 Vodil</option>
+                        <option value="Yoshlarobod">🏡 Yoshlarobod</option>
+                        <option value="Novkat">🌾 Novkat</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Haqiqiy sport zali yoki maydonni tanlash */}
+                  <div>
+                    <label className="text-zinc-300 font-bold block mb-1">Sport zali yoki maydon (Google Maps ro'yxati):</label>
+                    <select
+                      value={newGameVenueId}
+                      onChange={(e) => {
+                        const vid = e.target.value;
+                        setNewGameVenueId(vid);
+                        const ven = venues.find(v => v.id === vid);
+                        if (ven) {
+                          setNewGameTotalPrice(ven.pricePerHour);
+                          setNewGameVillage(ven.village);
+                        }
+                      }}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-emerald-400 font-bold"
+                    >
+                      {venues
+                        .filter(v => (v.village === newGameVillage || newGameVillage === 'Barchasi'))
+                        .map(v => (
+                          <option key={v.id} value={v.id}>
+                            {v.name} ({v.village} - {v.pricePerHour.toLocaleString()} so'm/s)
+                          </option>
+                        ))}
                     </select>
                   </div>
-                  <input name="time" defaultValue="20:00 - 21:30" required className="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800" />
-                  <button type="submit" className="w-full py-2.5 rounded-xl bg-emerald-500 text-black font-extrabold text-xs shadow">
-                    O'yinni e'lon qilish
-                  </button>
+
+                  {/* Bepul yoki Pulli tanlovi */}
+                  <div className="p-3.5 rounded-2xl bg-zinc-950 border border-zinc-800 space-y-3">
+                    <label className="text-zinc-300 font-bold block">O'yin to'lov formati:</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setNewGameIsFree(false)}
+                        className={`p-2.5 rounded-xl border font-bold flex items-center justify-center gap-1.5 transition-all ${
+                          !newGameIsFree ? 'bg-amber-500/20 border-amber-500 text-amber-300 ring-2 ring-amber-500/30' : 'border-zinc-800 text-zinc-400'
+                        }`}
+                      >
+                        <span>💳 Pulli (Ijara taqsimlash)</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setNewGameIsFree(true)}
+                        className={`p-2.5 rounded-xl border font-bold flex items-center justify-center gap-1.5 transition-all ${
+                          newGameIsFree ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300 ring-2 ring-emerald-500/30' : 'border-zinc-800 text-zinc-400'
+                        }`}
+                      >
+                        <span>🆓 Bepul o'yin</span>
+                      </button>
+                    </div>
+
+                    {!newGameIsFree && (
+                      <div className="grid grid-cols-2 gap-3 pt-2 border-t border-zinc-800/80">
+                        <div>
+                          <label className="text-[11px] text-zinc-400 font-semibold block mb-1">Zal ijara narxi (so'm):</label>
+                          <input
+                            type="number"
+                            value={newGameTotalPrice}
+                            onChange={(e) => setNewGameTotalPrice(Number(e.target.value))}
+                            step="10000"
+                            min="0"
+                            className="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-700 text-white font-bold"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[11px] text-zinc-400 font-semibold block mb-1">O'yinchilar soni:</label>
+                          <input
+                            type="number"
+                            value={newGameMaxPlayers}
+                            onChange={(e) => setNewGameMaxPlayers(Number(e.target.value))}
+                            min="2"
+                            max="30"
+                            className="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-700 text-white font-bold"
+                          />
+                        </div>
+                        <div className="col-span-2 p-2 rounded-xl bg-zinc-900/60 flex items-center justify-between text-xs">
+                          <span className="text-zinc-400">Kishi boshiga taqsimlangan narx:</span>
+                          <span className="font-black text-emerald-400 text-sm">
+                            {newGameMaxPlayers > 0 ? Math.round(newGameTotalPrice / newGameMaxPlayers).toLocaleString() : 0} so'm / odam
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Vaqt va Sana */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-zinc-300 font-bold block mb-1">Sana:</label>
+                      <input
+                        type="text"
+                        value={newGameDateInput}
+                        onChange={(e) => setNewGameDateInput(e.target.value)}
+                        placeholder="Bugun"
+                        className="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-white font-semibold"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-zinc-300 font-bold block mb-1">Vaqt oralig'i:</label>
+                      <input
+                        type="text"
+                        value={newGameTimeInput}
+                        onChange={(e) => setNewGameTimeInput(e.target.value)}
+                        placeholder="20:00 - 21:30"
+                        className="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-white font-semibold"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="pt-2 flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsCreateGameOpen(false)}
+                      className="flex-1 py-3 rounded-2xl bg-zinc-800 text-zinc-300 font-bold text-xs"
+                    >
+                      Bekor qilish
+                    </button>
+                    <button
+                      type="submit"
+                      className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-black font-black text-xs shadow-lg transition-all"
+                    >
+                      O'yinni e'lon qilish ➔
+                    </button>
+                  </div>
                 </form>
               </div>
             </div>

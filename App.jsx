@@ -33,6 +33,78 @@ const UZ_OPERATORS = {
 
 const INITIAL_VENUES = [
   {
+    id: 'v_fg1',
+    name: "Farg'ona 'Istiqlol' Markaziy Sport Majmuasi",
+    type: 'football_pitch',
+    category: 'Futbol / Yugurish',
+    sport: 'Futbol',
+    village: "Farg'ona",
+    address: "Farg'ona shahri, Istiqlol ko'chasi 1-uy",
+    lat: 40.3892,
+    lng: 71.7835,
+    pricePerHour: 180000,
+    rating: 4.9,
+    image: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80',
+    facilities: ["Xalqaro standartdagi stadion", "Yoritish projektorlari", "VIP kiyinish xonasi", "Dush va sauna"],
+    contactPerson: {
+      name: "Soliyev Olimjon",
+      role: "Majmua bosh direktori",
+      phone: "+998 90 160-22-33",
+      workHours: "07:00 - 23:00",
+      avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80"
+    },
+    coords: { x: 50, y: 20 },
+    subscription: { plan: '12 oylik', status: 'active', daysLeft: 310, expiresAt: '2027-01-15' }
+  },
+  {
+    id: 'v_fg2',
+    name: "Farg'ona Olimpiya Zaxiralari Voleybol va Basketbol Saroyi",
+    type: 'school_gym',
+    category: 'Voleybol / Basketbol',
+    sport: 'Voleybol',
+    village: "Farg'ona",
+    address: "Farg'ona shahri, Al-Farg'oniy shoh ko'chasi 42",
+    lat: 40.3815,
+    lng: 71.7780,
+    pricePerHour: 130000,
+    rating: 4.9,
+    image: 'https://images.unsplash.com/photo-1519766304817-4f37bda74a29?auto=format&fit=crop&w=800&q=80',
+    facilities: ["Parket pol", "Elektron tablo", "Professional voleybol to'ri", "Tribunalar"],
+    contactPerson: {
+      name: "Qosimov Alisher",
+      role: "Bosh murabbiy",
+      phone: "+998 91 650-44-55",
+      workHours: "08:00 - 22:00",
+      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80"
+    },
+    coords: { x: 45, y: 25 },
+    subscription: { plan: '6 oylik', status: 'active', daysLeft: 180, expiresAt: '2026-09-10' }
+  },
+  {
+    id: 'v_fg3',
+    name: "Farg'ona 'Neftchi' Sun'iy Qoplamali Futbol Maydoni",
+    type: 'football_pitch',
+    category: 'Futbol',
+    sport: 'Futbol',
+    village: "Farg'ona",
+    address: "Farg'ona shahri, Yangi Asr ko'chasi 15",
+    lat: 40.3950,
+    lng: 71.7910,
+    pricePerHour: 150000,
+    rating: 4.8,
+    image: 'https://images.unsplash.com/photo-1551958219-acbc608c6377?auto=format&fit=crop&w=800&q=80',
+    facilities: ["Zamonaviy chim", "Kuchli projektor", "Muzdek ichimliklar", "Avtoturargoh"],
+    contactPerson: {
+      name: "Mamajonov Bekzod",
+      role: "Maydon ma'muri",
+      phone: "+998 93 440-12-34",
+      workHours: "08:00 - 01:00",
+      avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=200&q=80"
+    },
+    coords: { x: 55, y: 15 },
+    subscription: { plan: '3 oylik', status: 'active', daysLeft: 75, expiresAt: '2026-05-25' }
+  },
+  {
     id: 'v1',
     name: "14-sonli umumta'lim maktabi sport zali",
     type: 'school_gym',
@@ -40,6 +112,8 @@ const INITIAL_VENUES = [
     sport: 'Voleybol',
     village: 'Vodil',
     address: "Vodil qishlog'i, Mustaqillik ko'chasi 45-uy",
+    lat: 40.1805,
+    lng: 71.7262,
     pricePerHour: 100000,
     rating: 4.8,
     image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=800&q=80',
@@ -168,6 +242,47 @@ const INITIAL_VENUES = [
 
 const INITIAL_GAMES = [
   {
+    id: 'g_fg1',
+    title: "Farg'ona Shahar Oqshom Voleybol Matchi",
+    sport: 'Voleybol',
+    venueId: 'v_fg2',
+    venueName: "Farg'ona Olimpiya Zaxiralari Voleybol va Basketbol Saroyi",
+    village: "Farg'ona",
+    lat: 40.3815,
+    lng: 71.7780,
+    date: "Bugun, 11-Sentabr",
+    time: "20:00 - 21:30",
+    isFree: false,
+    totalPrice: 130000,
+    maxPlayers: 12,
+    level: "O'rta daraja",
+    creator: "Qosimov Alisher (Admin)",
+    participants: [
+      { id: 'p_fg1', name: "Qosimov Alisher", phone: "+998 91 650-44-55", status: "To'langan", method: "Payme", avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=120&q=80" },
+      { id: 'p_fg2', name: "Javohir Ergashev", phone: "+998 90 220-33-44", status: "To'langan", method: "Click", avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80" }
+    ]
+  },
+  {
+    id: 'g_fg2',
+    title: "Farg'ona 'Istiqlol' Katta Futbol Matchi",
+    sport: 'Futbol',
+    venueId: 'v_fg1',
+    venueName: "Farg'ona 'Istiqlol' Markaziy Sport Majmuasi",
+    village: "Farg'ona",
+    lat: 40.3892,
+    lng: 71.7835,
+    date: "Ertaga, 12-Sentabr",
+    time: "19:00 - 20:30",
+    isFree: false,
+    totalPrice: 180000,
+    maxPlayers: 14,
+    level: "Yuqori daraja",
+    creator: "Soliyev Olimjon (Admin)",
+    participants: [
+      { id: 'p_fg3', name: "Soliyev Olimjon", phone: "+998 90 160-22-33", status: "To'langan", method: "Click", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80" }
+    ]
+  },
+  {
     id: 'g1',
     title: "Vodil 14-maktab Oqshom Voleyboli",
     sport: 'Voleybol',
@@ -261,6 +376,23 @@ export default function App() {
   const [isSuperAdminModalOpen, setIsSuperAdminModalOpen] = useState(false);
   const [adminPasswordInput, setAdminPasswordInput] = useState('');
   const [adminPasswordError, setAdminPasswordError] = useState(false);
+
+  // ADMIN HUQUQLARI VA TO'LOV TIZIMI (MONETIZATSIYA)
+  const [isAdmin, setIsAdmin] = useState(() => localStorage.getItem('fs_is_admin') === 'true');
+  const [isAdminPaymentModalOpen, setIsAdminPaymentModalOpen] = useState(false);
+  const [ownerCard, setOwnerCard] = useState(() => localStorage.getItem('fs_owner_card') || '8600 **** **** ****');
+  const [ownerCardInput, setOwnerCardInput] = useState(() => localStorage.getItem('fs_owner_card') || '8600 **** **** ****');
+
+  // YANGI O'YIN OCHISH STATE
+  const [newGameTitleInput, setNewGameTitleInput] = useState('');
+  const [newGameSport, setNewGameSport] = useState('Voleybol');
+  const [newGameVillage, setNewGameVillage] = useState("Farg'ona");
+  const [newGameVenueId, setNewGameVenueId] = useState('v_fg2');
+  const [newGameIsFree, setNewGameIsFree] = useState(false);
+  const [newGameTotalPrice, setNewGameTotalPrice] = useState(130000);
+  const [newGameMaxPlayers, setNewGameMaxPlayers] = useState(12);
+  const [newGameDateInput, setNewGameDateInput] = useState('Bugun, 11-Sentabr');
+  const [newGameTimeInput, setNewGameTimeInput] = useState('20:00 - 21:30');
 
   // TELEFON RAQAMINI HAQIQIY EKANLIGINI TEKSHIRISH VA SMS KOD TIZIMI
   const [phoneDigits, setPhoneDigits] = useState(() => {
@@ -547,6 +679,16 @@ export default function App() {
       return matchSport && matchVillage;
     });
   }, [games, selectedSport, selectedVillage]);
+
+  const canCreateGame = isSuperAdminUnlocked || currentRole === 'super_admin' || currentRole === 'hall_admin' || currentRole === 'admin' || isAdmin;
+
+  const handleOpenCreateGame = () => {
+    if (canCreateGame) {
+      setIsCreateGameOpen(true);
+    } else {
+      setIsAdminPaymentModalOpen(true);
+    }
+  };
 
   const schoolGyms = useMemo(() => venues.filter(v => v.type === 'school_gym'), [venues]);
   const footballPitches = useMemo(() => venues.filter(v => v.type === 'football_pitch'), [venues]);
@@ -1241,7 +1383,7 @@ export default function App() {
                   <div className="flex items-center justify-between">
                     <h3 className="text-base font-black">Sport turini tanlang:</h3>
                     <div className="flex items-center gap-1">
-                      {['Barchasi', 'Yoshlarobod', 'Vodil', 'Novkat'].map(v => (
+                      {['Barchasi', "Farg'ona", 'Vodil', 'Yoshlarobod', 'Novkat'].map(v => (
                         <button
                           key={v}
                           onClick={() => setSelectedVillage(v)}
@@ -1291,12 +1433,28 @@ export default function App() {
                       <p className="text-xs text-zinc-400">Tafsilotlar va to'lov hisoblagichini ko'rish uchun bosing</p>
                     </div>
 
-                    <button
-                      onClick={() => setIsCreateGameOpen(true)}
-                      className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black text-xs font-extrabold flex items-center gap-1 shadow"
-                    >
-                      <Plus className="w-4 h-4" /> O'yin ochish
-                    </button>
+                    <div className="flex items-center gap-2">
+                      {canCreateGame ? (
+                        <span className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-[11px] font-black text-emerald-400">
+                          🛡️ Admin: Cheklanmagan
+                        </span>
+                      ) : (
+                        <span className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/30 text-[11px] font-black text-amber-400">
+                          🔒 O'yin ochish: Admin kerak
+                        </span>
+                      )}
+                      <button
+                        onClick={handleOpenCreateGame}
+                        className={`px-3.5 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5 shadow-md transition-all ${
+                          canCreateGame
+                            ? 'bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-black'
+                            : 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black'
+                        }`}
+                      >
+                        <Plus className="w-4 h-4" />
+                        <span>{canCreateGame ? "O'yin ochish" : "O'yin ochish (Admin)"}</span>
+                      </button>
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
@@ -1884,59 +2042,335 @@ export default function App() {
         </div>
       )}
 
-      {/* YANGI O'YIN MODALI */}
+      {/* ODDİY FOYDALANUVCHILAR UCHUN CHEKLOV VA ADMIN HUQUQINI SOTIB OLISH MODALI */}
+      {isAdminPaymentModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
+          <div className="w-full max-w-md rounded-3xl bg-zinc-900 border border-zinc-800 p-6 space-y-4 shadow-2xl text-zinc-100">
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-800">
+              <div className="flex items-center gap-2.5">
+                <span className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-lg">
+                  🔒
+                </span>
+                <div>
+                  <h3 className="text-sm font-black text-white">O'yin ochish cheklangan!</h3>
+                  <p className="text-[11px] text-zinc-400">Faqat rasmiy Adminlar uchun ruxsat etilgan</p>
+                </div>
+              </div>
+              <button onClick={() => setIsAdminPaymentModalOpen(false)} className="text-zinc-400 hover:text-white p-1">✕</button>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 space-y-1">
+              <p className="font-bold">⚠️ Hurmatli foydalanuvchi!</p>
+              <p className="text-[11px] leading-relaxed text-amber-200/90">
+                Platformamizda xavfsizlik va tartibni saqlash maqsadida oddiy foydalanuvchilarga o'yin e'lon qilish cheklangan. 
+                O'yin tashkil qilish huquqi faqat <b>tasdiqlangan Adminlar uchun cheklanmagan</b>.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <h4 className="text-xs font-black uppercase text-zinc-400">Admin bo'lish va cheksiz o'yin ochish:</h4>
+              <div className="p-3.5 rounded-2xl bg-zinc-950 border border-zinc-800 space-y-2.5 text-xs">
+                <div className="flex justify-between items-center">
+                  <span className="text-zinc-400">Tashkilotchi admin to'lovi:</span>
+                  <span className="font-black text-emerald-400 text-sm">50 000 so'm / oy</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-zinc-400">Imtiyoz:</span>
+                  <span className="font-bold text-white">Cheksiz o'yinlar tashkil qilish</span>
+                </div>
+                <div className="pt-2 border-t border-zinc-800 space-y-1">
+                  <span className="text-[11px] text-zinc-400 block">To'lov tushadigan admin kartasi:</span>
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-zinc-900 border border-zinc-700 font-mono font-bold text-emerald-400">
+                    <span className="tracking-wider">{ownerCard}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(ownerCard.replace(/\s/g, ''));
+                        showToast("Karta raqami nusxalandi!");
+                      }}
+                      className="px-2 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-[10px] text-zinc-300 font-sans"
+                    >
+                      Nusxa olish
+                    </button>
+                  </div>
+                  {ownerCard.includes('*') && (
+                    <p className="text-[10px] text-amber-400 pt-0.5">
+                      (Karta raqami admin tomonidan tez orada kiritiladi. Aloqa: +998 90 555-14-22)
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2 pt-1">
+              <p className="text-[11px] text-zinc-400 text-center">
+                Admin kartasiga 50 000 so'm to'lov qilib, quyidagi tugmani bosing:
+              </p>
+              <button
+                onClick={() => {
+                  setIsAdmin(true);
+                  localStorage.setItem('fs_is_admin', 'true');
+                  setIsAdminPaymentModalOpen(false);
+                  setIsCreateGameOpen(true);
+                  showToast("🎉 Tabriklaymiz! Sizga cheksiz o'yin ochish Admin huquqi berildi!");
+                }}
+                className="w-full py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-black font-black text-xs shadow-lg transition-all flex items-center justify-center gap-1.5"
+              >
+                <span>✅ To'lov qildim, Admin huquqini faollashtirish</span>
+              </button>
+              <button
+                onClick={() => setIsAdminPaymentModalOpen(false)}
+                className="w-full py-2 rounded-xl bg-zinc-800 text-zinc-300 text-xs font-bold"
+              >
+                Yopish
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* YANGI O'YIN TASHKIL QILISH (ADMINLAR UCHUN CHEKLANMAGAN) */}
       {isCreateGameOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
-          <div className="w-full max-w-md rounded-3xl bg-zinc-900 border border-zinc-800 p-5 space-y-3 text-zinc-100">
-            <div className="flex justify-between pb-2 border-b border-zinc-800">
-              <h3 className="text-sm font-bold">Yangi o'yin ochish</h3>
-              <button onClick={() => setIsCreateGameOpen(false)}>✕</button>
+          <div className="w-full max-w-lg max-h-[92vh] overflow-y-auto rounded-3xl bg-zinc-900 border border-zinc-800 p-5 sm:p-6 space-y-4 shadow-2xl text-zinc-100">
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-800">
+              <div className="flex items-center gap-2">
+                <span className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-lg">
+                  🛡️
+                </span>
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <h3 className="text-base font-black text-white">Yangi O'yin Ochish</h3>
+                    <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">
+                      Admin Huquqi
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-zinc-400">Farg'ona, Vodil, Yoshlarobod, Novkat sport majmualarida</p>
+                </div>
+              </div>
+              <button onClick={() => setIsCreateGameOpen(false)} className="text-zinc-400 hover:text-white p-1">✕</button>
             </div>
+
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                const fd = new FormData(e.currentTarget);
+                const chosenVenue = venues.find(v => v.id === newGameVenueId) || venues[0];
+                const finalTitle = newGameTitleInput || `${chosenVenue.village} ${newGameSport} Do'stona O'yini`;
                 const newG = {
                   id: 'g_' + Date.now(),
-                  title: fd.get('title') || "Do'stona Voleybol o'yini",
-                  sport: fd.get('sport') || 'Voleybol',
-                  venueId: 'v1',
-                  venueName: "14-maktab sport zali",
-                  village: fd.get('village') || 'Vodil',
-                  date: "Bugun",
-                  time: fd.get('time') || "20:00 - 21:30",
-                  isFree: fd.get('isFree') === 'free',
-                  totalPrice: fd.get('isFree') === 'free' ? 0 : 120000,
-                  maxPlayers: parseInt(fd.get('maxPlayers') || '12'),
-                  level: "O'rta daraja",
-                  creator: userProfile.name,
+                  title: finalTitle,
+                  sport: newGameSport,
+                  venueId: chosenVenue.id,
+                  venueName: chosenVenue.name,
+                  village: chosenVenue.village,
+                  lat: chosenVenue.lat,
+                  lng: chosenVenue.lng,
+                  date: newGameDateInput || "Bugun",
+                  time: newGameTimeInput || "20:00 - 21:30",
+                  isFree: newGameIsFree,
+                  totalPrice: newGameIsFree ? 0 : Number(newGameTotalPrice),
+                  maxPlayers: Number(newGameMaxPlayers),
+                  level: "Barcha darajalar",
+                  creator: `${userProfile.name} (Admin)`,
                   participants: [
-                    { id: 'p_creator', name: userProfile.name, phone: userProfile.phone, status: "To'langan", method: "Payme", avatar: userProfile.avatar }
+                    {
+                      id: 'p_creator_' + Date.now(),
+                      name: userProfile.name,
+                      phone: userProfile.phone,
+                      status: "To'langan",
+                      method: newGameIsFree ? "Bepul" : "Admin",
+                      avatar: userProfile.avatar
+                    }
                   ]
                 };
-                setGames(p => [newG, ...p]);
+
+                setGames(prev => [newG, ...prev]);
                 setIsCreateGameOpen(false);
-                showToast("Yangi o'yin e'loni qo'shildi!");
+                showToast(`🎉 "${newG.title}" o'yini e'lon qilindi!`);
               }}
-              className="space-y-3 text-xs"
+              className="space-y-4 text-xs"
             >
-              <input name="title" defaultValue="Do'stona Voleybol o'yini" required className="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800" />
-              <div className="grid grid-cols-2 gap-2">
-                <select name="sport" defaultValue={selectedSport} className="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800">
-                  <option value="Voleybol">Voleybol</option>
-                  <option value="Futbol">Futbol</option>
-                  <option value="Basketbol">Basketbol</option>
-                </select>
-                <select name="village" defaultValue="Vodil" className="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800">
-                  <option value="Yoshlarobod">Yoshlarobod</option>
-                  <option value="Vodil">Vodil</option>
-                  <option value="Novkat">Novkat</option>
+              {/* O'yin nomi */}
+              <div>
+                <label className="text-zinc-300 font-bold block mb-1">O'yin nomi / Sarlavha:</label>
+                <input
+                  type="text"
+                  value={newGameTitleInput}
+                  onChange={(e) => setNewGameTitleInput(e.target.value)}
+                  placeholder="Masalan: Farg'ona Olimpiya Zali Voleybol Oqshomi"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-white font-semibold focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+
+              {/* Sport turi va Hudud */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-zinc-300 font-bold block mb-1">Sport turi:</label>
+                  <select
+                    value={newGameSport}
+                    onChange={(e) => {
+                      const s = e.target.value;
+                      setNewGameSport(s);
+                      const matching = venues.find(v => (v.sport === s || v.category.includes(s)) && v.village === newGameVillage);
+                      if (matching) {
+                        setNewGameVenueId(matching.id);
+                        setNewGameTotalPrice(matching.pricePerHour);
+                      }
+                    }}
+                    className="w-full px-3 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-white font-bold"
+                  >
+                    <option value="Voleybol">🏐 Voleybol</option>
+                    <option value="Futbol">⚽ Futbol</option>
+                    <option value="Basketbol">🏀 Basketbol</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-zinc-300 font-bold block mb-1">Hudud (Qishloq/Shahar):</label>
+                  <select
+                    value={newGameVillage}
+                    onChange={(e) => {
+                      const vil = e.target.value;
+                      setNewGameVillage(vil);
+                      const matching = venues.find(v => (v.sport === newGameSport || v.category.includes(newGameSport)) && v.village === vil) || venues.find(v => v.village === vil);
+                      if (matching) {
+                        setNewGameVenueId(matching.id);
+                        setNewGameTotalPrice(matching.pricePerHour);
+                      }
+                    }}
+                    className="w-full px-3 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-white font-bold"
+                  >
+                    <option value="Farg'ona">🏢 Farg'ona shahri</option>
+                    <option value="Vodil">🌲 Vodil</option>
+                    <option value="Yoshlarobod">🏡 Yoshlarobod</option>
+                    <option value="Novkat">🌾 Novkat</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Haqiqiy sport zali yoki maydonni tanlash */}
+              <div>
+                <label className="text-zinc-300 font-bold block mb-1">Sport zali yoki maydon (Google Maps ro'yxati):</label>
+                <select
+                  value={newGameVenueId}
+                  onChange={(e) => {
+                    const vid = e.target.value;
+                    setNewGameVenueId(vid);
+                    const ven = venues.find(v => v.id === vid);
+                    if (ven) {
+                      setNewGameTotalPrice(ven.pricePerHour);
+                      setNewGameVillage(ven.village);
+                    }
+                  }}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-emerald-400 font-bold"
+                >
+                  {venues
+                    .filter(v => (v.village === newGameVillage || newGameVillage === 'Barchasi'))
+                    .map(v => (
+                      <option key={v.id} value={v.id}>
+                        {v.name} ({v.village} - {v.pricePerHour.toLocaleString()} so'm/s)
+                      </option>
+                    ))}
                 </select>
               </div>
-              <input name="time" defaultValue="20:00 - 21:30" required className="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800" />
-              <button type="submit" className="w-full py-2.5 rounded-xl bg-emerald-500 text-black font-extrabold text-xs shadow">
-                O'yinni e'lon qilish
-              </button>
+
+              {/* Bepul yoki Pulli tanlovi */}
+              <div className="p-3.5 rounded-2xl bg-zinc-950 border border-zinc-800 space-y-3">
+                <label className="text-zinc-300 font-bold block">O'yin to'lov formati:</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setNewGameIsFree(false)}
+                    className={`p-2.5 rounded-xl border font-bold flex items-center justify-center gap-1.5 transition-all ${
+                      !newGameIsFree ? 'bg-amber-500/20 border-amber-500 text-amber-300 ring-2 ring-amber-500/30' : 'border-zinc-800 text-zinc-400'
+                    }`}
+                  >
+                    <span>💳 Pulli (Ijara taqsimlash)</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setNewGameIsFree(true)}
+                    className={`p-2.5 rounded-xl border font-bold flex items-center justify-center gap-1.5 transition-all ${
+                      newGameIsFree ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300 ring-2 ring-emerald-500/30' : 'border-zinc-800 text-zinc-400'
+                    }`}
+                  >
+                    <span>🆓 Bepul o'yin</span>
+                  </button>
+                </div>
+
+                {!newGameIsFree && (
+                  <div className="grid grid-cols-2 gap-3 pt-2 border-t border-zinc-800/80">
+                    <div>
+                      <label className="text-[11px] text-zinc-400 font-semibold block mb-1">Zal ijara narxi (so'm):</label>
+                      <input
+                        type="number"
+                        value={newGameTotalPrice}
+                        onChange={(e) => setNewGameTotalPrice(Number(e.target.value))}
+                        step="10000"
+                        min="0"
+                        className="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-700 text-white font-bold"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[11px] text-zinc-400 font-semibold block mb-1">O'yinchilar soni:</label>
+                      <input
+                        type="number"
+                        value={newGameMaxPlayers}
+                        onChange={(e) => setNewGameMaxPlayers(Number(e.target.value))}
+                        min="2"
+                        max="30"
+                        className="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-700 text-white font-bold"
+                      />
+                    </div>
+                    <div className="col-span-2 p-2 rounded-xl bg-zinc-900/60 flex items-center justify-between text-xs">
+                      <span className="text-zinc-400">Kishi boshiga taqsimlangan narx:</span>
+                      <span className="font-black text-emerald-400 text-sm">
+                        {newGameMaxPlayers > 0 ? Math.round(newGameTotalPrice / newGameMaxPlayers).toLocaleString() : 0} so'm / odam
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Vaqt va Sana */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-zinc-300 font-bold block mb-1">Sana:</label>
+                  <input
+                    type="text"
+                    value={newGameDateInput}
+                    onChange={(e) => setNewGameDateInput(e.target.value)}
+                    placeholder="Bugun"
+                    className="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-white font-semibold"
+                  />
+                </div>
+                <div>
+                  <label className="text-zinc-300 font-bold block mb-1">Vaqt oralig'i:</label>
+                  <input
+                    type="text"
+                    value={newGameTimeInput}
+                    onChange={(e) => setNewGameTimeInput(e.target.value)}
+                    placeholder="20:00 - 21:30"
+                    className="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-white font-semibold"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-2 flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsCreateGameOpen(false)}
+                  className="flex-1 py-3 rounded-2xl bg-zinc-800 text-zinc-300 font-bold text-xs"
+                >
+                  Bekor qilish
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-black font-black text-xs shadow-lg transition-all"
+                >
+                  O'yinni e'lon qilish ➔
+                </button>
+              </div>
             </form>
           </div>
         </div>
