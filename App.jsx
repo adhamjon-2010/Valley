@@ -507,6 +507,12 @@ export default function App() {
     };
   });
 
+  const [userNameInput, setUserNameInput] = useState(() => userProfile.name || '');
+  const [telegramBotUsername, setTelegramBotUsername] = useState(() => localStorage.getItem('fs_tg_bot_username') || 'ValleyAuth_bot');
+  const [telegramBotToken, setTelegramBotToken] = useState(() => localStorage.getItem('fs_tg_bot_token') || '');
+  const [telegramChatId, setTelegramChatId] = useState(() => localStorage.getItem('fs_tg_chat_id') || '');
+  const [eskizToken, setEskizToken] = useState(() => localStorage.getItem('fs_eskiz_token') || '');
+
   const [toastMessage, setToastMessage] = useState(null);
   const showToast = (msg, type = 'success') => {
     setToastMessage({ text: msg, type });
@@ -544,31 +550,44 @@ export default function App() {
     return res;
   };
 
-  // Telefon raqamini kiritish va operatorni tekshirish
+  // Raqamni tozalash va boshqa raqam kiritish
+  const handleClearPhone = () => {
+    setPhoneDigits('');
+    setIsPhoneVerified(false);
+    setIsOtpSent(false);
+    setOtpInput('');
+    setPhoneError('');
+    setDetectedOperator(null);
+    showToast("Raqam tozalandi. Yangi raqam kiritishingiz mumkin.");
+  };
+
+  // Telefon raqamini kiritish va operatorni tekshirish (ixtiyoriy yangi raqam yozish imkoniyati bilan)
   const handlePhoneChange = (val) => {
     let clean = val.replace(/\D/g, '');
     if (clean.startsWith('998')) {
       clean = clean.substring(3);
     }
-    clean = clean.substring(0, 9);
+    // Agar 9 tadan oshsa, yangi terilgan oxirgi 9 ta raqam olinadi
+    if (clean.length > 9) {
+      clean = clean.slice(-9);
+    }
 
     setPhoneDigits(clean);
     setIsPhoneVerified(false);
     setIsOtpSent(false);
     setOtpInput('');
+    setPhoneError('');
 
     if (clean.length >= 2) {
       const opCode = clean.substring(0, 2);
       if (UZ_OPERATORS[opCode]) {
         setDetectedOperator(UZ_OPERATORS[opCode]);
-        setPhoneError('');
       } else {
         setDetectedOperator(null);
         setPhoneError(`"${opCode}" kodi O'zbekiston mobil operatorlarida mavjud emas! (90, 91, 93, 94, 97, 88, 99, 95, 77, 33, 50, 20)`);
       }
     } else {
       setDetectedOperator(null);
-      setPhoneError('');
     }
   };
 
@@ -580,8 +599,8 @@ export default function App() {
     return false;
   };
 
-  // Haqiqiy SMS yuborish (saytga emas, to'g'ridan-to'g'ri SMS qilib yuborish)
-  const handleSendSmsCode = () => {
+  // Haqiqiy SMS yoki Telegram orqali kod yuborish
+  const handleSendSmsCode = async () => {
     if (phoneDigits.length !== 9) {
       setPhoneError("Telefon raqami to'liq emas! 9 ta raqam bo'lishi shart.");
       showToast("Telefon raqamini to'liq kiriting!", "error");
@@ -607,22 +626,46 @@ export default function App() {
     setIsOtpSent(true);
     setOtpCountdown(60);
 
-    // Native SMS ilovasini ochish (Android / iOS SMS ilovasi orqali yuborish)
-    const fullPhone = `+998${phoneDigits}`;
-    const smsBody = `Valley ilovasi tasdiqlash kodi: ${code}`;
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    const smsUrl = isIOS 
-      ? `sms:${fullPhone}&body=${encodeURIComponent(smsBody)}`
-      : `sms:${fullPhone}?body=${encodeURIComponent(smsBody)}`;
-
-    try {
-      window.location.href = smsUrl;
-    } catch (e) {
-      console.log("SMS URI ochilmadi:", e);
+    // Eskiz.uz SMS Shlyuzi
+    const savedEskiz = localStorage.getItem('fs_eskiz_token');
+    if (savedEskiz) {
+      try {
+        await fetch('https://notify.eskiz.uz/api/message/sms/send', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${savedEskiz}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            mobile_phone: '998' + phoneDigits,
+            message: `Valley tasdiqlash kodi: ${code}`,
+            from: '4546'
+          })
+        });
+      } catch (e) {
+        console.log("Eskiz API:", e);
+      }
     }
 
-    console.log(`[Valley SMS Xizmati] ${fullPhone} raqamiga yuborilgan tasdiqlash kodi:`, code);
-    showToast(`📲 SMS xabarnoma yuborildi: +998 ${formatPhoneDisplay(phoneDigits)}`);
+    // Telegram Bot: Agar Bot Token bo'lsa
+    const savedBotToken = localStorage.getItem('fs_tg_bot_token');
+    const savedChatId = localStorage.getItem('fs_tg_chat_id');
+    if (savedBotToken && savedChatId) {
+      try {
+        await fetch(`https://api.telegram.org/bot${savedBotToken}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: savedChatId,
+            text: `🔐 Valley tasdiqlash kodi: ${code}\n📱 Telefon: +998 ${phoneDigits}`
+          })
+        });
+      } catch (e) {
+        console.log("Telegram Bot xatosi:", e);
+      }
+    }
+
+    showToast(`📲 Xabarnoma jo'natildi: +998 ${formatPhoneDisplay(phoneDigits)}`);
   };
 
   // Kiritilgan SMS kodni tekshirish
@@ -630,10 +673,41 @@ export default function App() {
     if (otpInput.trim() === generatedOtp) {
       setIsPhoneVerified(true);
       setPhoneError('');
-      showToast("✅ Telefon raqam haqiqiyligi muvaffaqiyatli tasdiqlandi!");
+      showToast("✅ Telefon raqam muvaffaqiyatli tasdiqlandi!");
     } else {
-      showToast("Xato SMS kod! Qayta tekshirib kiriting.", "error");
+      showToast("Xato kod! Qayta tekshirib kiriting yoki Telegram bot orqali oling.", "error");
     }
+  };
+
+  // TO'LIQ ANONIM KIRISH (SMS VA KOD TALAB QILINMAYDI)
+  const handleAnonymousLogin = () => {
+    const randomNum = Math.floor(100 + Math.random() * 900);
+    const anonName = (userNameInput && userNameInput.trim()) ? userNameInput.trim() : `Anonim O'yinchi #${randomNum}`;
+    const villageInput = document.getElementById('login_village');
+    const sportInput = document.getElementById('login_sport');
+    const village = villageInput ? villageInput.value : (userProfile.village || "Farg'ona");
+    const sport = sportInput ? sportInput.value : (userProfile.primarySport || "Voleybol");
+
+    const up = {
+      ...userProfile,
+      name: anonName,
+      phone: phoneDigits ? ('+998 ' + formatPhoneDisplay(phoneDigits)) : "Anonim (maxfiy)",
+      age: userProfile.age || 20,
+      village: village,
+      primarySport: sport,
+      verified: true,
+      isAnonymous: true
+    };
+
+    setUserProfile(up);
+    setSelectedSport(sport);
+    setSelectedVillage(village);
+    localStorage.setItem('fs_current_user', JSON.stringify(up));
+    localStorage.setItem('fs_user_logged_in', 'true');
+    trackVisitor(up);
+
+    setAppStep(2);
+    showToast(`🎭 Xush kelibsiz! To'liq anonim rejimda kirdingiz.`);
   };
 
   // Bosh Admin uchun yangi tashrif qayd etish (faqat haqiqiy ma'lumotlar)
@@ -880,7 +954,8 @@ export default function App() {
                   <User className="w-4 h-4 text-zinc-500 absolute left-3 top-3" />
                   <input
                     id="login_name"
-                    defaultValue={userProfile.name}
+                    value={userNameInput}
+                    onChange={(e) => setUserNameInput(e.target.value)}
                     required
                     placeholder="Ismingiz va familiyangizni kiriting"
                     className={`w-full pl-9 pr-3 py-2.5 rounded-xl border ${isDark ? 'bg-zinc-950 border-zinc-800' : 'bg-zinc-50 border-zinc-300'} font-semibold focus:outline-none focus:border-emerald-500`}
@@ -918,17 +993,16 @@ export default function App() {
                       value={formatPhoneDisplay(phoneDigits)}
                       onChange={(e) => handlePhoneChange(e.target.value)}
                       placeholder="90 123 45 67"
-                      disabled={isPhoneVerified}
                       className="flex-1 min-w-0 px-3 py-2.5 bg-transparent font-mono font-bold text-sm tracking-wide focus:outline-none"
                     />
 
                     {/* Tozalash yoki Tasdiqlangan belgisi */}
-                    {phoneDigits && !isPhoneVerified && (
+                    {phoneDigits.length > 0 && (
                       <button
                         type="button"
-                        onClick={() => handlePhoneChange('')}
-                        className="px-2.5 text-zinc-400 hover:text-zinc-200 text-sm"
-                        title="Tozalash"
+                        onClick={handleClearPhone}
+                        className="px-2.5 text-zinc-400 hover:text-rose-400 text-base font-bold transition-colors"
+                        title="Raqamni tozalash"
                       >
                         ✕
                       </button>
@@ -942,19 +1016,49 @@ export default function App() {
                     )}
                   </div>
 
-                  {/* SMS Kod Yuborish Tugmasi (Agar hali tasdiqlanmagan bo'lsa) */}
-                  {!isPhoneVerified && (
-                    <button
-                      type="button"
-                      onClick={handleSendSmsCode}
-                      disabled={otpCountdown > 0 || phoneDigits.length !== 9}
-                      className="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:bg-zinc-800 disabled:text-zinc-500 text-black text-xs font-black shadow transition-all flex items-center justify-center gap-2"
-                    >
-                      <Phone className="w-4 h-4" />
-                      <span>
-                        {otpCountdown > 0 ? `Qayta SMS yuborish (${otpCountdown}s)` : isOtpSent ? "SMS kodni qayta yuborish" : "SMS orqali kod yuborish"}
+                  {/* Boshqa nomer kiritish tezkor tugmasi */}
+                  {phoneDigits.length > 0 && (
+                    <div className="flex items-center justify-between px-1">
+                      <button
+                        type="button"
+                        onClick={handleClearPhone}
+                        className="text-[11px] text-zinc-400 hover:text-emerald-400 font-bold flex items-center gap-1 transition-colors"
+                      >
+                        <span>🔄 Boshqa raqam kiritish</span>
+                      </button>
+                      <span className="text-[10px] text-zinc-500 font-mono">
+                        {phoneDigits.length}/9 raqam
                       </span>
-                    </button>
+                    </div>
+                  )}
+
+                  {/* SMS / Telegram Kod Yuborish Tugmalari */}
+                  {!isPhoneVerified && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                      <button
+                        type="button"
+                        onClick={handleSendSmsCode}
+                        disabled={otpCountdown > 0 || phoneDigits.length !== 9}
+                        className="py-2.5 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:bg-zinc-800 disabled:text-zinc-500 text-black text-xs font-black shadow transition-all flex items-center justify-center gap-1.5"
+                      >
+                        <Phone className="w-3.5 h-3.5" />
+                        <span>
+                          {otpCountdown > 0 ? `Qayta yuborish (${otpCountdown}s)` : isOtpSent ? "Kodni qayta yuborish" : "SMS orqali kod olish"}
+                        </span>
+                      </button>
+
+                      <a
+                        href={`https://t.me/${telegramBotUsername.replace('@', '')}?start=auth_${generatedOtp || 'valley'}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={() => {
+                          if (!isOtpSent) handleSendSmsCode();
+                        }}
+                        className="py-2.5 px-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-black shadow transition-all flex items-center justify-center gap-1.5 text-center"
+                      >
+                        <span>✈️ Telegram Botdan kod olish</span>
+                      </a>
+                    </div>
                   )}
                 </div>
 
@@ -967,22 +1071,24 @@ export default function App() {
                 )}
               </div>
 
-              {/* SMS KOD KIRITISH VA HAQIQIY SMS ILOVASI HAVOLALARI */}
+              {/* SMS / TELEGRAM KOD KIRITISH TIZIMI */}
               {isOtpSent && !isPhoneVerified && (
                 <div className="p-3.5 rounded-2xl bg-zinc-950 border border-emerald-500/40 space-y-3 animate-fadeIn">
-                  <div className="flex items-start gap-2">
-                    <span className="text-xl">📩</span>
+                  <div className="flex items-start gap-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-lg shrink-0 border border-emerald-500/20">
+                      📩
+                    </div>
                     <div>
-                      <p className="text-xs font-bold text-emerald-400">SMS xabarnoma yuborildi!</p>
-                      <p className="text-[11px] text-zinc-400">
-                        +998 {formatPhoneDisplay(phoneDigits)} raqamingizga SMS orqali tasdiqlash kodi yuborildi.
+                      <p className="text-xs font-bold text-emerald-400">Tasdiqlash xabarnomasi jo'natildi!</p>
+                      <p className="text-[11px] text-zinc-400 mt-0.5">
+                        +998 {formatPhoneDisplay(phoneDigits)} raqamingizga kod jo'natildi. Kodni quyidagi maydonga kiriting yoki Telegram bot orqali oling.
                       </p>
                     </div>
                   </div>
 
                   <div className="space-y-1">
                     <label className="text-[11px] text-zinc-300 font-bold block">
-                      SMS orqali kelgan 4 xonali kodni kiriting:
+                      4 xonali tasdiqlash kodini kiriting:
                     </label>
                     <div className="flex items-center gap-2">
                       <input
@@ -991,35 +1097,38 @@ export default function App() {
                         maxLength={4}
                         value={otpInput}
                         onChange={(e) => setOtpInput(e.target.value.replace(/\D/g, ''))}
-                        placeholder="Masalan: 7492"
-                        className="flex-1 px-3 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-center font-mono text-base font-black tracking-widest text-emerald-400 focus:outline-none focus:border-emerald-500"
+                        placeholder="••••"
+                        className="flex-1 px-3 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-center font-mono text-lg font-black tracking-widest text-emerald-400 focus:outline-none focus:border-emerald-500"
                       />
                       <button
                         type="button"
                         onClick={handleVerifyOtp}
-                        className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs shadow-md transition-all shrink-0"
+                        disabled={otpInput.length !== 4}
+                        className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:bg-zinc-800 disabled:text-zinc-500 text-black font-black text-xs shadow-md transition-all shrink-0"
                       >
                         Tasdiqlash
                       </button>
                     </div>
                   </div>
 
-                  {/* SMS / Telegram Tezkor Havolalari */}
-                  <div className="pt-2 border-t border-zinc-800 flex items-center gap-2 text-[11px]">
+                  {/* Telegram Bot va Tezkor Anonim Kirish yordamchilari */}
+                  <div className="pt-2 border-t border-zinc-800/80 flex flex-col gap-2 text-[11px]">
                     <a
-                      href={`sms:+998${phoneDigits}?body=${encodeURIComponent('Valley ilovasi tasdiqlash kodi: ' + generatedOtp)}`}
-                      className="flex-1 py-1.5 px-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-center text-zinc-300 font-semibold flex items-center justify-center gap-1"
-                    >
-                      <span>💬 SMS ilovasida ko'rish</span>
-                    </a>
-                    <a
-                      href={`https://t.me/share/url?url=${encodeURIComponent('Valley kodi: ' + generatedOtp)}`}
+                      href={`https://t.me/${telegramBotUsername.replace('@', '')}?start=auth_${generatedOtp}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="py-1.5 px-2 rounded-lg bg-sky-950/50 hover:bg-sky-900/50 border border-sky-600/40 text-sky-400 font-semibold flex items-center justify-center gap-1"
+                      className="w-full py-2 px-3 rounded-lg bg-sky-950/40 hover:bg-sky-900/40 border border-sky-500/30 text-sky-400 font-bold flex items-center justify-center gap-1.5 transition-all text-center"
                     >
-                      <span>✈️ Telegram</span>
+                      <span>🤖 Telegram Bot orqali kodni ochish: @{telegramBotUsername.replace('@', '')}</span>
                     </a>
+
+                    <button
+                      type="button"
+                      onClick={handleAnonymousLogin}
+                      className="w-full py-2 px-3 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 hover:text-emerald-400 font-bold flex items-center justify-center gap-1.5 transition-all"
+                    >
+                      <span>🎭 Kod kelmadimi? Anonim rejimda davom etish</span>
+                    </button>
                   </div>
                 </div>
               )}
@@ -1044,6 +1153,7 @@ export default function App() {
                     defaultValue={userProfile.village}
                     className={`w-full px-3 py-2.5 rounded-xl border ${isDark ? 'bg-zinc-950 border-zinc-800' : 'bg-zinc-50 border-zinc-300'} font-semibold`}
                   >
+                    <option value="Farg'ona">Farg'ona</option>
                     <option value="Vodil">Vodil</option>
                     <option value="Yoshlarobod">Yoshlarobod</option>
                     <option value="Novkat">Novkat</option>
@@ -1064,49 +1174,64 @@ export default function App() {
                 </select>
               </div>
 
-              {/* Kirish Tugmasi (Faqat raqam tasdiqlanganda yoki haqiqiy bo'lganda faol) */}
-              <button
-                type="button"
-                onClick={() => {
-                  const nameInput = document.getElementById('login_name');
-                  const ageInput = document.getElementById('login_age');
-                  const villageInput = document.getElementById('login_village');
-                  const sportInput = document.getElementById('login_sport');
+              <div className="space-y-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const nameInput = document.getElementById('login_name');
+                    const ageInput = document.getElementById('login_age');
+                    const villageInput = document.getElementById('login_village');
+                    const sportInput = document.getElementById('login_sport');
 
-                  const name = nameInput ? nameInput.value.trim() : userProfile.name;
-                  const age = ageInput ? ageInput.value.trim() : userProfile.age;
-                  const village = villageInput ? villageInput.value : userProfile.village;
-                  const sport = sportInput ? sportInput.value : userProfile.primarySport;
-                  const phone = phoneDigits ? ('+998 ' + formatPhoneDisplay(phoneDigits)) : userProfile.phone;
+                    const name = (userNameInput && userNameInput.trim()) || (nameInput ? nameInput.value.trim() : userProfile.name);
+                    const age = ageInput ? ageInput.value.trim() : userProfile.age;
+                    const village = villageInput ? villageInput.value : userProfile.village;
+                    const sport = sportInput ? sportInput.value : userProfile.primarySport;
+                    const phone = phoneDigits ? ('+998 ' + formatPhoneDisplay(phoneDigits)) : userProfile.phone;
 
-                  if (!name) {
-                    showToast("Ismingizni kiriting!", "error");
-                    return;
-                  }
+                    if (!name) {
+                      showToast("Ismingizni kiriting!", "error");
+                      return;
+                    }
 
-                  if (!isPhoneVerified) {
-                    // Agar hali SMS kod olmagan bo'lsa, kod olishni so'raymiz
-                    showToast("Iltimos, avval telefon raqamingizni SMS orqali tasdiqlang!", "error");
-                    handleSendSmsCode();
-                    return;
-                  }
+                    if (!isPhoneVerified) {
+                      showToast("Telefon raqamingizni tasdiqlang yoki 'Anonim kirish' tugmasini bosing!", "error");
+                      return;
+                    }
 
-                  const up = { ...userProfile, name, phone, age, village, primarySport: sport, verified: true };
-                  setUserProfile(up);
-                  setSelectedSport(sport);
-                  setSelectedVillage(village);
-                  localStorage.setItem('fs_current_user', JSON.stringify(up));
-                  localStorage.setItem('fs_user_logged_in', 'true');
-                  trackVisitor(up);
+                    const up = { ...userProfile, name, phone, age, village, primarySport: sport, verified: true };
+                    setUserProfile(up);
+                    setSelectedSport(sport);
+                    setSelectedVillage(village);
+                    localStorage.setItem('fs_current_user', JSON.stringify(up));
+                    localStorage.setItem('fs_user_logged_in', 'true');
+                    trackVisitor(up);
 
-                  setAppStep(2);
-                  showToast(`Xush kelibsiz, ${name}! Raqamingiz muvaffaqiyatli tasdiqlandi.`);
-                }}
-                className="w-full py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-black text-sm shadow-xl hover:opacity-95 transition-all flex items-center justify-center gap-2 mt-3"
-              >
-                <span>{isPhoneVerified ? "Keyingi: Xaritada joylashuvni tanlash" : "Raqamni tasdiqlash va Kirish"}</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
+                    setAppStep(2);
+                    showToast(`Xush kelibsiz, ${name}!`);
+                  }}
+                  className="w-full py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-black text-sm shadow-xl hover:opacity-95 transition-all flex items-center justify-center gap-2"
+                >
+                  <span>Keyingi: Xaritada joylashuvni tanlash</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+
+                {/* YOKI ANONIM KIRISH TUGMASI (KODSIZ VA TO'LIQ MAXFIY) */}
+                <div className="relative flex py-1 items-center">
+                  <div className="flex-grow border-t border-zinc-800"></div>
+                  <span className="flex-shrink mx-4 text-[10px] text-zinc-500 font-bold uppercase tracking-wider">YOKI</span>
+                  <div className="flex-grow border-t border-zinc-800"></div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleAnonymousLogin}
+                  className="w-full py-3 rounded-2xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 hover:border-emerald-500/50 text-zinc-200 font-extrabold text-xs shadow transition-all flex items-center justify-center gap-2 group"
+                >
+                  <span className="text-base group-hover:scale-110 transition-transform">🎭</span>
+                  <span>To'liq anonim kirish (Kod talab qilinmaydi)</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -1888,6 +2013,140 @@ export default function App() {
                         </div>
                       </div>
                     ))}
+                  </div>
+                </div>
+
+                {/* MENING BANK KARTAM (ADMIN TO'LOVLARI TUSHADIGAN KARTA) */}
+                <div className={`p-4 sm:p-5 rounded-2xl border ${cardBg} space-y-3.5 shadow-lg`}>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <h4 className="text-sm font-black uppercase tracking-wide text-cyan-400 flex items-center gap-2">
+                        <span>💳 Mening bank kartam (Admin to'lovlari tushadigan karta)</span>
+                      </h4>
+                      <p className="text-xs text-zinc-400 mt-0.5">
+                        Foydalanuvchilar o'yin ochish huquqi (Admin litsenziyasi) uchun to'lov qilganda ushbu kartaga pul tushadi
+                      </p>
+                    </div>
+                    <span className="text-[10px] font-black uppercase px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                      To'lov qabul qilish faol
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                    <input
+                      type="text"
+                      value={ownerCardInput}
+                      onChange={(e) => setOwnerCardInput(e.target.value)}
+                      placeholder="8600 1234 5678 9012"
+                      className="flex-1 px-4 py-2.5 rounded-xl bg-zinc-950 border border-zinc-700 font-mono text-sm text-emerald-400 font-bold focus:outline-none focus:border-emerald-500"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOwnerCard(ownerCardInput);
+                        localStorage.setItem('fs_owner_card', ownerCardInput);
+                        showToast("✅ Bank karta raqamingiz muvaffaqiyatli saqlandi!");
+                      }}
+                      className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs shadow-md transition-all shrink-0"
+                    >
+                      Kartani saqlash
+                    </button>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-zinc-950/60 border border-zinc-800 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                    <div>
+                      <span className="text-zinc-500">Ilovada ko'rinadigan faol karta: </span>
+                      <span className="font-mono font-black text-emerald-400">{ownerCard}</span>
+                      {ownerCard.includes('*') && (
+                        <span className="text-amber-400 text-[11px] block mt-0.5">
+                          ⚠️ (Karta raqami admin tomonidan tez orada kiritiladi)
+                        </span>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => {
+                        setIsAdmin(!isAdmin);
+                        localStorage.setItem('fs_is_admin', (!isAdmin).toString());
+                        showToast(isAdmin ? "Admin huquqi o'chirildi" : "Admin huquqi yoqildi!");
+                      }}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold border ${isAdmin ? 'bg-amber-500/10 text-amber-400 border-amber-500/30' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'}`}
+                    >
+                      {isAdmin ? "Admin huquqini sinov uchun o'chirish" : "O'zimga Admin huquqini berish"}
+                    </button>
+                  </div>
+                </div>
+
+                {/* TELEGRAM BOT VA SMS SHLYUZ (ESKIZ.UZ) SOZLAMALARI */}
+                <div className={`p-4 sm:p-5 rounded-2xl border ${cardBg} space-y-3.5 shadow-lg`}>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <h4 className="text-sm font-black uppercase tracking-wide text-cyan-400 flex items-center gap-2">
+                        <span>🤖 Telegram Bot va 📩 SMS Shlyuz (Eskiz.uz) sozlamalari</span>
+                      </h4>
+                      <p className="text-xs text-zinc-400 mt-0.5">
+                        Foydalanuvchilarga tasdiqlash kodlarini avtomatik Telegram Bot yoki haqiqiy SMS orqali yuborish
+                      </p>
+                    </div>
+                    <span className="text-[10px] font-black uppercase px-2.5 py-1 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
+                      Avtomatlashtirish
+                    </span>
+                  </div>
+
+                  <div className="space-y-3 text-xs">
+                    {/* Telegram Bot Username */}
+                    <div className="space-y-1">
+                      <label className="text-zinc-400 font-bold block">1. Telegram Bot Username (masalan: @ValleyAuth_bot):</label>
+                      <input
+                        type="text"
+                        value={telegramBotUsername}
+                        onChange={(e) => setTelegramBotUsername(e.target.value)}
+                        placeholder="@ValleyAuth_bot"
+                        className="w-full px-4 py-2.5 rounded-xl bg-zinc-950 border border-zinc-700 font-mono text-xs text-cyan-400 font-bold focus:outline-none focus:border-cyan-500"
+                      />
+                    </div>
+
+                    {/* Telegram Bot Token */}
+                    <div className="space-y-1">
+                      <label className="text-zinc-400 font-bold block">2. Telegram Bot Token (@BotFather bergan API token):</label>
+                      <input
+                        type="password"
+                        value={telegramBotToken}
+                        onChange={(e) => setTelegramBotToken(e.target.value)}
+                        placeholder="1234567890:ABCdefGhIJKlmNoPQRsTUVwxyZ..."
+                        className="w-full px-4 py-2.5 rounded-xl bg-zinc-950 border border-zinc-700 font-mono text-xs text-zinc-300 font-bold focus:outline-none focus:border-cyan-500"
+                      />
+                      <p className="text-[10px] text-zinc-500">
+                        💡 Telegramda @BotFather ga kiring, /newbot deb yozing va berilgan tokenni shu yerga qo'ying.
+                      </p>
+                    </div>
+
+                    {/* Eskiz.uz SMS Token */}
+                    <div className="space-y-1">
+                      <label className="text-zinc-400 font-bold block">3. Eskiz.uz SMS Token (O'zbekiston raqamlariga haqiqiy SMS uchun):</label>
+                      <input
+                        type="password"
+                        value={eskizToken}
+                        onChange={(e) => setEskizToken(e.target.value)}
+                        placeholder="Eskiz.uz API bearer token..."
+                        className="w-full px-4 py-2.5 rounded-xl bg-zinc-950 border border-zinc-700 font-mono text-xs text-zinc-300 font-bold focus:outline-none focus:border-emerald-500"
+                      />
+                      <p className="text-[10px] text-zinc-500">
+                        💡 Eskiz.uz saytidan ro'yxatdan o'tib, token kiritilsa — foydalanuvchilar telefoniga to'g'ridan-to'g'ri SMS boradi.
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        localStorage.setItem('fs_tg_bot_username', telegramBotUsername);
+                        localStorage.setItem('fs_tg_bot_token', telegramBotToken);
+                        localStorage.setItem('fs_eskiz_token', eskizToken);
+                        showToast("✅ Telegram Bot va SMS sozlamalari saqlandi!");
+                      }}
+                      className="px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-black text-xs shadow-md transition-all"
+                    >
+                      Bot va SMS sozlamalarini saqlash
+                    </button>
                   </div>
                 </div>
               </div>
