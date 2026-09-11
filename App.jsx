@@ -1047,17 +1047,20 @@ export default function App() {
                         </span>
                       </button>
 
-                      <a
-                        href={`https://t.me/${telegramBotUsername.replace('@', '')}?start=auth_${generatedOtp || 'valley'}`}
-                        target="_blank"
-                        rel="noreferrer"
+                      <button
+                        type="button"
                         onClick={() => {
+                          if (telegramBotUsername === 'ValleyAuth_bot' && !telegramBotToken) {
+                            showToast("💡 Bot ochish: Telegramda @BotFather ga kiring, /newbot deb bot oching va Bosh Adminga tokenni qo'ying. Hozircha quyidagi sinov kodidan foydalaning!");
+                          } else {
+                            window.open(`https://t.me/${telegramBotUsername.replace('@', '')}?start=auth_${generatedOtp || 'valley'}`, '_blank');
+                          }
                           if (!isOtpSent) handleSendSmsCode();
                         }}
                         className="py-2.5 px-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-black shadow transition-all flex items-center justify-center gap-1.5 text-center"
                       >
                         <span>✈️ Telegram Botdan kod olish</span>
-                      </a>
+                      </button>
                     </div>
                   )}
                 </div>
@@ -1081,10 +1084,37 @@ export default function App() {
                     <div>
                       <p className="text-xs font-bold text-emerald-400">Tasdiqlash xabarnomasi jo'natildi!</p>
                       <p className="text-[11px] text-zinc-400 mt-0.5">
-                        +998 {formatPhoneDisplay(phoneDigits)} raqamingizga kod jo'natildi. Kodni quyidagi maydonga kiriting yoki Telegram bot orqali oling.
+                        +998 {formatPhoneDisplay(phoneDigits)} raqamingizga 4 xonali kod jo'natildi. Kodni quyidagi maydonga kiriting:
                       </p>
                     </div>
                   </div>
+
+                  {/* SINOV REJIMI UCHUN KOD KO'RSATISH VA 1-TUGMA BILAN TASDIQLASH */}
+                  {(!eskizToken && !telegramBotToken) && (
+                    <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className="font-bold text-amber-400 block text-xs">⚡ Sinov tasdiqlash kodi:</span>
+                          <span className="text-[10px] text-zinc-400">Eskiz.uz SMS yoki Telegram Bot ulanmaguncha:</span>
+                        </div>
+                        <span className="text-lg font-black font-mono px-3 py-1 rounded-lg bg-black/80 text-emerald-400 border border-emerald-500/40 tracking-widest select-all">
+                          {generatedOtp}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOtpInput(generatedOtp);
+                          setIsPhoneVerified(true);
+                          setPhoneError('');
+                          showToast("✅ Telefon raqam sinov kodi bilan tasdiqlandi!");
+                        }}
+                        className="w-full py-2 px-3 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs flex items-center justify-center gap-1.5 transition-all shadow"
+                      >
+                        <span>⚡ Kodni avtomatik kiritish va tasdiqlash</span>
+                      </button>
+                    </div>
+                  )}
 
                   <div className="space-y-1">
                     <label className="text-[11px] text-zinc-300 font-bold block">
@@ -1111,17 +1141,8 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Telegram Bot va Tezkor Anonim Kirish yordamchilari */}
+                  {/* Tezkor Anonim Kirish yordamchisi */}
                   <div className="pt-2 border-t border-zinc-800/80 flex flex-col gap-2 text-[11px]">
-                    <a
-                      href={`https://t.me/${telegramBotUsername.replace('@', '')}?start=auth_${generatedOtp}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="w-full py-2 px-3 rounded-lg bg-sky-950/40 hover:bg-sky-900/40 border border-sky-500/30 text-sky-400 font-bold flex items-center justify-center gap-1.5 transition-all text-center"
-                    >
-                      <span>🤖 Telegram Bot orqali kodni ochish: @{telegramBotUsername.replace('@', '')}</span>
-                    </a>
-
                     <button
                       type="button"
                       onClick={handleAnonymousLogin}
