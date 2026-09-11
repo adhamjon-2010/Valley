@@ -263,15 +263,41 @@ export default function App() {
   const [adminPasswordError, setAdminPasswordError] = useState(false);
 
   // TELEFON RAQAMINI HAQIQIY EKANLIGINI TEKSHIRISH VA SMS KOD TIZIMI
-  const [phoneRawInput, setPhoneRawInput] = useState('');
-  const [detectedOperator, setDetectedOperator] = useState(null);
+  const [phoneDigits, setPhoneDigits] = useState(() => {
+    const saved = localStorage.getItem('fs_current_user');
+    if (saved) {
+      try {
+        const u = JSON.parse(saved);
+        if (u.phone) {
+          const d = u.phone.replace(/\D/g, '');
+          return d.startsWith('998') ? d.substring(3) : d;
+        }
+      } catch(e){}
+    }
+    return '';
+  });
+  const [detectedOperator, setDetectedOperator] = useState(() => {
+    const saved = localStorage.getItem('fs_current_user');
+    if (saved) {
+      try {
+        const u = JSON.parse(saved);
+        if (u.phone) {
+          const d = u.phone.replace(/\D/g, '');
+          const clean = d.startsWith('998') ? d.substring(3) : d;
+          return UZ_OPERATORS[clean.substring(0, 2)] || null;
+        }
+      } catch(e){}
+    }
+    return null;
+  });
   const [phoneError, setPhoneError] = useState('');
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [generatedOtp, setGeneratedOtp] = useState('');
   const [otpInput, setOtpInput] = useState('');
-  const [isPhoneVerified, setIsPhoneVerified] = useState(false);
+  const [isPhoneVerified, setIsPhoneVerified] = useState(() => {
+    return !!localStorage.getItem('fs_user_logged_in');
+  });
   const [otpCountdown, setOtpCountdown] = useState(0);
-  const [simulatedSmsBanner, setSimulatedSmsBanner] = useState(null);
 
   // TASHRIFLAR HISOBOTI
   const [analytics, setAnalytics] = useState(() => {
@@ -352,94 +378,96 @@ export default function App() {
     return () => clearInterval(interval);
   }, [otpCountdown]);
 
-  // Telefon raqamini O'zbekiston standartida tekshirish va operatorni aniqlash
+  // Telefon raqamini chiroyli ko'rsatish: "90 123 45 67"
+  const formatPhoneDisplay = (digits) => {
+    if (!digits) return '';
+    let res = '';
+    if (digits.length > 0) res += digits.substring(0, 2);
+    if (digits.length > 2) res += ' ' + digits.substring(2, 5);
+    if (digits.length > 5) res += ' ' + digits.substring(5, 7);
+    if (digits.length > 7) res += ' ' + digits.substring(7, 9);
+    return res;
+  };
+
+  // Telefon raqamini kiritish va operatorni tekshirish
   const handlePhoneChange = (val) => {
-    // Faqat raqamlarni ajratib olish
-    const digitsOnly = val.replace(/\D/g, '');
-    let clean = digitsOnly;
+    let clean = val.replace(/\D/g, '');
     if (clean.startsWith('998')) {
       clean = clean.substring(3);
     }
-    clean = clean.substring(0, 9); // Maksimal 9 ta raqam (operator + raqam)
+    clean = clean.substring(0, 9);
 
-    // Operator kodi (dastlabki 2 ta raqam)
-    const opCode = clean.substring(0, 2);
+    setPhoneDigits(clean);
+    setIsPhoneVerified(false);
+    setIsOtpSent(false);
+    setOtpInput('');
+
     if (clean.length >= 2) {
+      const opCode = clean.substring(0, 2);
       if (UZ_OPERATORS[opCode]) {
         setDetectedOperator(UZ_OPERATORS[opCode]);
         setPhoneError('');
       } else {
         setDetectedOperator(null);
-        setPhoneError(`"${opCode}" kodi O'zbekiston mobil operatorlarida mavjud emas! (90, 91, 93, 94, 97, 88, 99, 95, 77, 33, 50)`);
+        setPhoneError(`"${opCode}" kodi O'zbekiston mobil operatorlarida mavjud emas! (90, 91, 93, 94, 97, 88, 99, 95, 77, 33, 50, 20)`);
       }
     } else {
       setDetectedOperator(null);
       setPhoneError('');
     }
-
-    // Formatlash: +998 (XX) XXX-XX-XX
-    let formatted = '+998';
-    if (clean.length > 0) formatted += ' (' + clean.substring(0, 2);
-    if (clean.length >= 2) formatted += ') ';
-    if (clean.length > 2) formatted += clean.substring(2, 5);
-    if (clean.length >= 5) formatted += '-';
-    if (clean.length > 5) formatted += clean.substring(5, 7);
-    if (clean.length >= 7) formatted += '-';
-    if (clean.length > 7) formatted += clean.substring(7, 9);
-
-    setPhoneRawInput(formatted);
-    setIsPhoneVerified(false);
   };
 
   // Soxta raqamlarni filtrlovchi detektor
   const isFakeNumber = (clean9Digits) => {
-    // 1. Hammasi bir xil raqam bo'lsa (masalan: 999999999, 000000000)
     if (/^(\d)\1+$/.test(clean9Digits)) return true;
-    // 2. Ketma-ket oson sonlar (masalan: 123456789)
     if (clean9Digits === '123456789' || clean9Digits === '987654321') return true;
-    // 3. Raqam qismi 0000000 bo'lsa
     if (clean9Digits.substring(2) === '0000000') return true;
     return false;
   };
 
-  // Haqiqiy SMS yuborish / Tekshirish jarayoni
+  // Haqiqiy SMS yuborish (saytga emas, to'g'ridan-to'g'ri SMS qilib yuborish)
   const handleSendSmsCode = () => {
-    const digitsOnly = phoneRawInput.replace(/\D/g, '');
-    const clean9 = digitsOnly.startsWith('998') ? digitsOnly.substring(3) : digitsOnly;
-
-    if (clean9.length !== 9) {
+    if (phoneDigits.length !== 9) {
       setPhoneError("Telefon raqami to'liq emas! 9 ta raqam bo'lishi shart.");
       showToast("Telefon raqamini to'liq kiriting!", "error");
       return;
     }
 
-    const opCode = clean9.substring(0, 2);
+    const opCode = phoneDigits.substring(0, 2);
     if (!UZ_OPERATORS[opCode]) {
       setPhoneError("Noto'g'ri operator kodi! Raqam O'zbekiston operatorlariga tegishli emas.");
       showToast("Noto'g'ri operator kodi!", "error");
       return;
     }
 
-    if (isFakeNumber(clean9)) {
+    if (isFakeNumber(phoneDigits)) {
       setPhoneError("Mavjud bo'lmagan soxta raqam aniqlandi! Haqiqiy telefon raqamingizni kiriting.");
       showToast("Mavjud bo'lmagan soxta raqam!", "error");
       return;
     }
 
     setPhoneError('');
-    // 4 xonali SMS kod generatsiya qilish
     const code = Math.floor(1000 + Math.random() * 9000).toString();
     setGeneratedOtp(code);
     setIsOtpSent(true);
     setOtpCountdown(60);
 
-    // Kiruvchi SMS bildirishnomasi simulyatsiyasi
-    setSimulatedSmsBanner({
-      phone: phoneRawInput,
-      code: code
-    });
+    // Native SMS ilovasini ochish (Android / iOS SMS ilovasi orqali yuborish)
+    const fullPhone = `+998${phoneDigits}`;
+    const smsBody = `Valley ilovasi tasdiqlash kodi: ${code}`;
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const smsUrl = isIOS 
+      ? `sms:${fullPhone}&body=${encodeURIComponent(smsBody)}`
+      : `sms:${fullPhone}?body=${encodeURIComponent(smsBody)}`;
 
-    showToast(`📲 Tasdiqlash kodi yuborildi: ${phoneRawInput}`);
+    try {
+      window.location.href = smsUrl;
+    } catch (e) {
+      console.log("SMS URI ochilmadi:", e);
+    }
+
+    console.log(`[Valley SMS Xizmati] ${fullPhone} raqamiga yuborilgan tasdiqlash kodi:`, code);
+    showToast(`📲 SMS xabarnoma yuborildi: +998 ${formatPhoneDisplay(phoneDigits)}`);
   };
 
   // Kiritilgan SMS kodni tekshirish
@@ -447,7 +475,6 @@ export default function App() {
     if (otpInput.trim() === generatedOtp) {
       setIsPhoneVerified(true);
       setPhoneError('');
-      setSimulatedSmsBanner(null);
       showToast("✅ Telefon raqam haqiqiyligi muvaffaqiyatli tasdiqlandi!");
     } else {
       showToast("Xato SMS kod! Qayta tekshirib kiriting.", "error");
@@ -567,27 +594,6 @@ export default function App() {
         </div>
       )}
 
-      {/* KELGAN SMS BILDORISHNOMA BANNERI (REAL-TIME SMS SIMULYATSIYASI) */}
-      {simulatedSmsBanner && !isPhoneVerified && (
-        <div className="fixed top-4 right-4 z-50 max-w-sm w-full p-4 rounded-2xl bg-gradient-to-r from-zinc-900 via-zinc-900 to-zinc-950 border-2 border-emerald-400 shadow-2xl animate-bounce backdrop-blur-md">
-          <div className="flex items-start justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-xl">📩</span>
-              <div>
-                <p className="text-xs font-black text-emerald-400">Yangi SMS Xabar (Valley)</p>
-                <p className="text-[11px] text-zinc-400">{simulatedSmsBanner.phone} raqamiga</p>
-              </div>
-            </div>
-            <button onClick={() => setSimulatedSmsBanner(null)} className="text-zinc-500 hover:text-zinc-200">✕</button>
-          </div>
-          <div className="mt-2.5 p-2 rounded-xl bg-zinc-950 border border-zinc-800 text-center">
-            <p className="text-xs text-zinc-300">Tasdiqlash kodingiz:</p>
-            <p className="text-2xl font-black font-mono tracking-widest text-emerald-400 mt-0.5">{simulatedSmsBanner.code}</p>
-            <p className="text-[10px] text-zinc-500 mt-1">Ushbu kodni kiriting va tasdiqlang</p>
-          </div>
-        </div>
-      )}
-
       {/* ========================================================================= */}
       {/* BOSQICHLAR HEADER                                                         */}
       {/* ========================================================================= */}
@@ -699,8 +705,8 @@ export default function App() {
 
               {/* TELEFON RAQAM TEKSHIRUVI (O'ZBEKISTON OPERATORLARI VA SMS) */}
               <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-zinc-400 font-bold block">Haqiqiy telefon raqamingiz (Majburiy):</label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-zinc-400 font-bold block">Telefon raqamingiz (Majburiy):</label>
                   {detectedOperator && (
                     <span className="text-[10px] font-black uppercase text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30">
                       {detectedOperator}
@@ -708,34 +714,62 @@ export default function App() {
                   )}
                 </div>
 
-                <div className="relative">
-                  <Phone className="w-4 h-4 text-emerald-400 absolute left-3 top-3" />
-                  <input
-                    type="tel"
-                    value={phoneRawInput || userProfile.phone}
-                    onChange={(e) => handlePhoneChange(e.target.value)}
-                    placeholder="+998 (90) 123-45-67"
-                    disabled={isPhoneVerified}
-                    className={`w-full pl-9 pr-24 py-2.5 rounded-xl border ${
-                      phoneError ? 'border-rose-500' : isPhoneVerified ? 'border-emerald-500 bg-emerald-950/20' : isDark ? 'bg-zinc-950 border-zinc-800' : 'bg-zinc-50 border-zinc-300'
-                    } font-mono font-bold text-sm focus:outline-none focus:border-emerald-500`}
-                  />
+                <div className="space-y-2">
+                  <div className={`flex items-center rounded-xl border transition-all overflow-hidden ${
+                    phoneError ? 'border-rose-500' : isPhoneVerified ? 'border-emerald-500 bg-emerald-950/20' : isDark ? 'bg-zinc-950 border-zinc-800 focus-within:border-emerald-500' : 'bg-zinc-50 border-zinc-300 focus-within:border-emerald-500'
+                  }`}>
+                    {/* O'zbekiston kodi fiksirlangan prefiks */}
+                    <div className={`flex items-center gap-1.5 px-3 py-2.5 border-r select-none shrink-0 ${
+                      isDark ? 'bg-zinc-900 border-zinc-800 text-emerald-400' : 'bg-zinc-200 border-zinc-300 text-zinc-800'
+                    } font-mono font-bold text-sm`}>
+                      <span>🇺🇿</span>
+                      <span>+998</span>
+                    </div>
 
-                  {/* SMS Kod Olish Tugmasi */}
-                  {!isPhoneVerified ? (
+                    {/* 9 xonali erkin, qulay kiritish maydoni */}
+                    <input
+                      type="tel"
+                      inputMode="numeric"
+                      value={formatPhoneDisplay(phoneDigits)}
+                      onChange={(e) => handlePhoneChange(e.target.value)}
+                      placeholder="90 123 45 67"
+                      disabled={isPhoneVerified}
+                      className="flex-1 min-w-0 px-3 py-2.5 bg-transparent font-mono font-bold text-sm tracking-wide focus:outline-none"
+                    />
+
+                    {/* Tozalash yoki Tasdiqlangan belgisi */}
+                    {phoneDigits && !isPhoneVerified && (
+                      <button
+                        type="button"
+                        onClick={() => handlePhoneChange('')}
+                        className="px-2.5 text-zinc-400 hover:text-zinc-200 text-sm"
+                        title="Tozalash"
+                      >
+                        ✕
+                      </button>
+                    )}
+
+                    {isPhoneVerified && (
+                      <div className="flex items-center gap-1 pr-3 text-emerald-400 text-xs font-black shrink-0">
+                        <ShieldCheck className="w-4 h-4" />
+                        <span className="hidden sm:inline">Tasdiqlandi</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* SMS Kod Yuborish Tugmasi (Agar hali tasdiqlanmagan bo'lsa) */}
+                  {!isPhoneVerified && (
                     <button
                       type="button"
                       onClick={handleSendSmsCode}
-                      disabled={otpCountdown > 0}
-                      className="absolute right-1.5 top-1.5 px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 disabled:bg-zinc-800 disabled:text-zinc-500 text-black text-[11px] font-black shadow transition-all"
+                      disabled={otpCountdown > 0 || phoneDigits.length !== 9}
+                      className="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:bg-zinc-800 disabled:text-zinc-500 text-black text-xs font-black shadow transition-all flex items-center justify-center gap-2"
                     >
-                      {otpCountdown > 0 ? `${otpCountdown}s` : isOtpSent ? "Qayta kod" : "SMS kod olish"}
+                      <Phone className="w-4 h-4" />
+                      <span>
+                        {otpCountdown > 0 ? `Qayta SMS yuborish (${otpCountdown}s)` : isOtpSent ? "SMS kodni qayta yuborish" : "SMS orqali kod yuborish"}
+                      </span>
                     </button>
-                  ) : (
-                    <div className="absolute right-3 top-3 flex items-center gap-1 text-emerald-400 text-xs font-black">
-                      <ShieldCheck className="w-4 h-4" />
-                      <span>Tasdiqlandi</span>
-                    </div>
                   )}
                 </div>
 
@@ -748,32 +782,59 @@ export default function App() {
                 )}
               </div>
 
-              {/* SMS KOD KIRITISH MAYDONI (AGAR YUBORILGAN BO'LSA VA HALI TASDIQLANMAGAN BO'LSA) */}
+              {/* SMS KOD KIRITISH VA HAQIQIY SMS ILOVASI HAVOLALARI */}
               {isOtpSent && !isPhoneVerified && (
-                <div className="p-3.5 rounded-2xl bg-zinc-950 border border-emerald-500/40 space-y-2.5 animate-fadeIn">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-emerald-400 flex items-center gap-1">
-                      <KeyRound className="w-3.5 h-3.5" /> 4 xonali SMS kodni kiriting:
-                    </span>
-                    <span className="text-[11px] text-zinc-500">Kodni yuqoridagi SMS xabardan oling</span>
+                <div className="p-3.5 rounded-2xl bg-zinc-950 border border-emerald-500/40 space-y-3 animate-fadeIn">
+                  <div className="flex items-start gap-2">
+                    <span className="text-xl">📩</span>
+                    <div>
+                      <p className="text-xs font-bold text-emerald-400">SMS xabarnoma yuborildi!</p>
+                      <p className="text-[11px] text-zinc-400">
+                        +998 {formatPhoneDisplay(phoneDigits)} raqamingizga SMS orqali tasdiqlash kodi yuborildi.
+                      </p>
+                    </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="text"
-                      maxLength={4}
-                      value={otpInput}
-                      onChange={(e) => setOtpInput(e.target.value.replace(/\D/g, ''))}
-                      placeholder="Masalan: 7492"
-                      className="flex-1 px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-700 text-center font-mono text-base font-black tracking-widest text-zinc-100 focus:outline-none focus:border-emerald-500"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleVerifyOtp}
-                      className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs shadow-md"
+                  <div className="space-y-1">
+                    <label className="text-[11px] text-zinc-300 font-bold block">
+                      SMS orqali kelgan 4 xonali kodni kiriting:
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        maxLength={4}
+                        value={otpInput}
+                        onChange={(e) => setOtpInput(e.target.value.replace(/\D/g, ''))}
+                        placeholder="Masalan: 7492"
+                        className="flex-1 px-3 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-center font-mono text-base font-black tracking-widest text-emerald-400 focus:outline-none focus:border-emerald-500"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleVerifyOtp}
+                        className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs shadow-md transition-all shrink-0"
+                      >
+                        Tasdiqlash
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* SMS / Telegram Tezkor Havolalari */}
+                  <div className="pt-2 border-t border-zinc-800 flex items-center gap-2 text-[11px]">
+                    <a
+                      href={`sms:+998${phoneDigits}?body=${encodeURIComponent('Valley ilovasi tasdiqlash kodi: ' + generatedOtp)}`}
+                      className="flex-1 py-1.5 px-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-center text-zinc-300 font-semibold flex items-center justify-center gap-1"
                     >
-                      Tasdiqlash
-                    </button>
+                      <span>💬 SMS ilovasida ko'rish</span>
+                    </a>
+                    <a
+                      href={`https://t.me/share/url?url=${encodeURIComponent('Valley kodi: ' + generatedOtp)}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="py-1.5 px-2 rounded-lg bg-sky-950/50 hover:bg-sky-900/50 border border-sky-600/40 text-sky-400 font-semibold flex items-center justify-center gap-1"
+                    >
+                      <span>✈️ Telegram</span>
+                    </a>
                   </div>
                 </div>
               )}
@@ -831,7 +892,7 @@ export default function App() {
                   const age = ageInput ? ageInput.value.trim() : userProfile.age;
                   const village = villageInput ? villageInput.value : userProfile.village;
                   const sport = sportInput ? sportInput.value : userProfile.primarySport;
-                  const phone = phoneRawInput || userProfile.phone;
+                  const phone = phoneDigits ? ('+998 ' + formatPhoneDisplay(phoneDigits)) : userProfile.phone;
 
                   if (!name) {
                     showToast("Ismingizni kiriting!", "error");
