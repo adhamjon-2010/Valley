@@ -344,7 +344,7 @@ const INITIAL_GAMES = [
 
 export default function App() {
   const [theme, setTheme] = useState(() => localStorage.getItem('fs_theme') || 'dark');
-  const [appStep, setAppStep] = useState(() => localStorage.getItem('fs_user_logged_in') ? 3 : 1);
+  const [appStep, setAppStep] = useState(1);
   const [isProfileSidebarOpen, setIsProfileSidebarOpen] = useState(false);
   const [is3DMapMode, setIs3DMapMode] = useState(true);
   const [mapRotation, setMapRotation] = useState({ x: 50, z: -20 });
@@ -406,9 +406,7 @@ export default function App() {
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [generatedOtp, setGeneratedOtp] = useState('');
   const [otpInput, setOtpInput] = useState('');
-  const [isPhoneVerified, setIsPhoneVerified] = useState(() => {
-    return !!localStorage.getItem('fs_user_logged_in');
-  });
+  const [isPhoneVerified, setIsPhoneVerified] = useState(false);
   const [otpCountdown, setOtpCountdown] = useState(0);
 
   // HAQIQIY TASHRIFLAR VA FOYDALANUVCHILARNI TOZALASH FUNKSIYASI (YOLG'ON STATISTIKASIZ)
@@ -792,7 +790,13 @@ export default function App() {
               ].map(s => (
                 <button
                   key={s.step}
-                  onClick={() => setAppStep(s.step)}
+                  onClick={() => {
+                    if (s.step > 1 && !isPhoneVerified) {
+                      showToast("Iltimos, avval ismingizni kiriting va telefoningizni tasdiqlang!", "error");
+                      return;
+                    }
+                    setAppStep(s.step);
+                  }}
                   className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
                     appStep === s.step
                       ? 'bg-emerald-500 text-black shadow'
