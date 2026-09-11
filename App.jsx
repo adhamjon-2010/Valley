@@ -574,7 +574,7 @@ export default function App() {
             <div className="flex items-center gap-2">
               <span className="text-xl">📩</span>
               <div>
-                <p className="text-xs font-black text-emerald-400">Yangi SMS Xabar (Farg'ona Sport)</p>
+                <p className="text-xs font-black text-emerald-400">Yangi SMS Xabar (Valley)</p>
                 <p className="text-[11px] text-zinc-400">{simulatedSmsBanner.phone} raqamiga</p>
               </div>
             </div>
@@ -667,7 +667,7 @@ export default function App() {
             </div>
 
             <div>
-              <h2 className="text-xl font-black tracking-tight">Farg'ona Sport - Kirish</h2>
+              <h2 className="text-xl font-black tracking-tight">Valley - Kirish</h2>
               <p className="text-xs text-zinc-400 mt-1">
                 Iltimos, haqiqiy telefon raqamingizni kiriting va SMS orqali tasdiqlang
               </p>
@@ -994,7 +994,7 @@ export default function App() {
                 </div>
                 <div>
                   <h1 className="font-black text-sm sm:text-base tracking-tight bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-                    FARG'ONA SPORT
+                    VALLEY
                   </h1>
                   <p className="text-[11px] text-zinc-400 flex items-center gap-1">
                     <MapPin className="w-3 h-3 text-emerald-400" />
