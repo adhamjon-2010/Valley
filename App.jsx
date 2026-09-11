@@ -489,6 +489,9 @@ export default function App() {
       try {
         const u = JSON.parse(saved);
         if (u && u.name && u.name !== 'Azizbek Fayziyev') {
+          if (u.avatar && u.avatar.includes('photo-1535713875002')) {
+            u.avatar = null;
+          }
           return u;
         }
       } catch(e){}
@@ -500,7 +503,7 @@ export default function App() {
       primarySport: "Voleybol",
       userCoords: { x: 48, y: 70 },
       village: "Vodil",
-      avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=250&q=80",
+      avatar: null, // Soxta rasm yo'q - har bir foydalanuvchi o'zi rasm qo'yadi
       reminder2Hours: true,
       reminder30Min: true,
       verified: false
@@ -913,8 +916,12 @@ export default function App() {
               {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
 
-            <button onClick={() => setIsProfileSidebarOpen(true)} className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-extrabold text-xs shadow">
-              <img src={userProfile.avatar} alt="avatar" className="w-4 h-4 rounded-full object-cover" />
+            <button onClick={() => setIsProfileSidebarOpen(true)} className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-extrabold text-xs shadow">
+              {userProfile.avatar ? (
+                <img src={userProfile.avatar} alt="avatar" className="w-4 h-4 rounded-full object-cover" />
+              ) : (
+                <User className="w-3.5 h-3.5" />
+              )}
               <span>Profil</span>
             </button>
           </div>
@@ -934,17 +941,63 @@ export default function App() {
             <div>
               <h2 className="text-xl font-black tracking-tight">Valley - Kirish</h2>
               <p className="text-xs text-zinc-400 mt-1">
-                Iltimos, haqiqiy telefon raqamingizni kiriting va SMS orqali tasdiqlang
+                Yoshlarobod, Vodil, Novkat sport platformasi
               </p>
             </div>
 
-            {/* Rasm tanlash */}
+            {/* HAR BIR FOYDALANUVCHI O'Z RASMINI QO'YISHI UCHUN (SOXTA AVATAR YO'Q) */}
             <div className="relative inline-block mx-auto">
-              <img src={userProfile.avatar} alt="avatar" className="w-20 h-20 rounded-full object-cover border-4 border-emerald-500 shadow-xl" />
-              <label className="absolute bottom-0 right-0 p-1.5 rounded-full bg-emerald-500 text-black cursor-pointer shadow-md hover:scale-110">
-                <Camera className="w-4 h-4" />
-                <input type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" />
+              <label className="cursor-pointer group flex flex-col items-center justify-center">
+                {userProfile.avatar ? (
+                  <div className="relative">
+                    <img
+                      src={userProfile.avatar}
+                      alt="Profil rasmi"
+                      className="w-24 h-24 rounded-full object-cover border-4 border-emerald-500 shadow-xl"
+                    />
+                    <div className="absolute bottom-0 right-0 p-2 rounded-full bg-emerald-500 text-black shadow-lg group-hover:scale-110 transition-transform">
+                      <Camera className="w-4 h-4" />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="w-24 h-24 rounded-full border-2 border-dashed border-emerald-500/60 hover:border-emerald-400 bg-zinc-900/90 hover:bg-zinc-800 flex flex-col items-center justify-center text-zinc-400 hover:text-emerald-400 transition-all shadow-inner group">
+                    <div className="w-9 h-9 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
+                      <Camera className="w-5 h-5" />
+                    </div>
+                    <span className="text-[10px] font-bold text-zinc-300 group-hover:text-emerald-300">Rasm qo'yish</span>
+                  </div>
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = (evt) => {
+                        const base64 = evt.target.result;
+                        setUserProfile(p => ({ ...p, avatar: base64 }));
+                        showToast("✅ O'z rasmingiz muvaffaqiyatli qo'yildi!");
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                  className="hidden"
+                />
               </label>
+              {userProfile.avatar && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setUserProfile(p => ({ ...p, avatar: null }));
+                    showToast("Rasm olib tashlandi");
+                  }}
+                  className="text-[10px] text-zinc-500 hover:text-rose-400 font-bold block mt-1.5 transition-colors mx-auto text-center"
+                >
+                  ✕ Rasmni olib tashlash
+                </button>
+              )}
             </div>
 
             <div className="space-y-4 text-left text-xs">
@@ -962,197 +1015,6 @@ export default function App() {
                   />
                 </div>
               </div>
-
-              {/* TELEFON RAQAM TEKSHIRUVI (O'ZBEKISTON OPERATORLARI VA SMS) */}
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-zinc-400 font-bold block">Telefon raqamingiz (Majburiy):</label>
-                  {detectedOperator && (
-                    <span className="text-[10px] font-black uppercase text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30">
-                      {detectedOperator}
-                    </span>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <div className={`flex items-center rounded-xl border transition-all overflow-hidden ${
-                    phoneError ? 'border-rose-500' : isPhoneVerified ? 'border-emerald-500 bg-emerald-950/20' : isDark ? 'bg-zinc-950 border-zinc-800 focus-within:border-emerald-500' : 'bg-zinc-50 border-zinc-300 focus-within:border-emerald-500'
-                  }`}>
-                    {/* O'zbekiston kodi fiksirlangan prefiks */}
-                    <div className={`flex items-center gap-1.5 px-3 py-2.5 border-r select-none shrink-0 ${
-                      isDark ? 'bg-zinc-900 border-zinc-800 text-emerald-400' : 'bg-zinc-200 border-zinc-300 text-zinc-800'
-                    } font-mono font-bold text-sm`}>
-                      <span>🇺🇿</span>
-                      <span>+998</span>
-                    </div>
-
-                    {/* 9 xonali erkin, qulay kiritish maydoni */}
-                    <input
-                      type="tel"
-                      inputMode="numeric"
-                      value={formatPhoneDisplay(phoneDigits)}
-                      onChange={(e) => handlePhoneChange(e.target.value)}
-                      placeholder="90 123 45 67"
-                      className="flex-1 min-w-0 px-3 py-2.5 bg-transparent font-mono font-bold text-sm tracking-wide focus:outline-none"
-                    />
-
-                    {/* Tozalash yoki Tasdiqlangan belgisi */}
-                    {phoneDigits.length > 0 && (
-                      <button
-                        type="button"
-                        onClick={handleClearPhone}
-                        className="px-2.5 text-zinc-400 hover:text-rose-400 text-base font-bold transition-colors"
-                        title="Raqamni tozalash"
-                      >
-                        ✕
-                      </button>
-                    )}
-
-                    {isPhoneVerified && (
-                      <div className="flex items-center gap-1 pr-3 text-emerald-400 text-xs font-black shrink-0">
-                        <ShieldCheck className="w-4 h-4" />
-                        <span className="hidden sm:inline">Tasdiqlandi</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Boshqa nomer kiritish tezkor tugmasi */}
-                  {phoneDigits.length > 0 && (
-                    <div className="flex items-center justify-between px-1">
-                      <button
-                        type="button"
-                        onClick={handleClearPhone}
-                        className="text-[11px] text-zinc-400 hover:text-emerald-400 font-bold flex items-center gap-1 transition-colors"
-                      >
-                        <span>🔄 Boshqa raqam kiritish</span>
-                      </button>
-                      <span className="text-[10px] text-zinc-500 font-mono">
-                        {phoneDigits.length}/9 raqam
-                      </span>
-                    </div>
-                  )}
-
-                  {/* SMS / Telegram Kod Yuborish Tugmalari */}
-                  {!isPhoneVerified && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-                      <button
-                        type="button"
-                        onClick={handleSendSmsCode}
-                        disabled={otpCountdown > 0 || phoneDigits.length !== 9}
-                        className="py-2.5 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:bg-zinc-800 disabled:text-zinc-500 text-black text-xs font-black shadow transition-all flex items-center justify-center gap-1.5"
-                      >
-                        <Phone className="w-3.5 h-3.5" />
-                        <span>
-                          {otpCountdown > 0 ? `Qayta yuborish (${otpCountdown}s)` : isOtpSent ? "Kodni qayta yuborish" : "SMS orqali kod olish"}
-                        </span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (telegramBotUsername === 'ValleyAuth_bot' && !telegramBotToken) {
-                            showToast("💡 Bot ochish: Telegramda @BotFather ga kiring, /newbot deb bot oching va Bosh Adminga tokenni qo'ying. Hozircha quyidagi sinov kodidan foydalaning!");
-                          } else {
-                            window.open(`https://t.me/${telegramBotUsername.replace('@', '')}?start=auth_${generatedOtp || 'valley'}`, '_blank');
-                          }
-                          if (!isOtpSent) handleSendSmsCode();
-                        }}
-                        className="py-2.5 px-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-black shadow transition-all flex items-center justify-center gap-1.5 text-center"
-                      >
-                        <span>✈️ Telegram Botdan kod olish</span>
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                {/* Xatolik xabari */}
-                {phoneError && (
-                  <p className="text-[11px] text-rose-400 mt-1 font-bold flex items-center gap-1">
-                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                    {phoneError}
-                  </p>
-                )}
-              </div>
-
-              {/* SMS / TELEGRAM KOD KIRITISH TIZIMI */}
-              {isOtpSent && !isPhoneVerified && (
-                <div className="p-3.5 rounded-2xl bg-zinc-950 border border-emerald-500/40 space-y-3 animate-fadeIn">
-                  <div className="flex items-start gap-2.5">
-                    <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-lg shrink-0 border border-emerald-500/20">
-                      📩
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold text-emerald-400">Tasdiqlash xabarnomasi jo'natildi!</p>
-                      <p className="text-[11px] text-zinc-400 mt-0.5">
-                        +998 {formatPhoneDisplay(phoneDigits)} raqamingizga 4 xonali kod jo'natildi. Kodni quyidagi maydonga kiriting:
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* SINOV REJIMI UCHUN KOD KO'RSATISH VA 1-TUGMA BILAN TASDIQLASH */}
-                  {(!eskizToken && !telegramBotToken) && (
-                    <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs space-y-2">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <span className="font-bold text-amber-400 block text-xs">⚡ Sinov tasdiqlash kodi:</span>
-                          <span className="text-[10px] text-zinc-400">Eskiz.uz SMS yoki Telegram Bot ulanmaguncha:</span>
-                        </div>
-                        <span className="text-lg font-black font-mono px-3 py-1 rounded-lg bg-black/80 text-emerald-400 border border-emerald-500/40 tracking-widest select-all">
-                          {generatedOtp}
-                        </span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setOtpInput(generatedOtp);
-                          setIsPhoneVerified(true);
-                          setPhoneError('');
-                          showToast("✅ Telefon raqam sinov kodi bilan tasdiqlandi!");
-                        }}
-                        className="w-full py-2 px-3 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs flex items-center justify-center gap-1.5 transition-all shadow"
-                      >
-                        <span>⚡ Kodni avtomatik kiritish va tasdiqlash</span>
-                      </button>
-                    </div>
-                  )}
-
-                  <div className="space-y-1">
-                    <label className="text-[11px] text-zinc-300 font-bold block">
-                      4 xonali tasdiqlash kodini kiriting:
-                    </label>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        maxLength={4}
-                        value={otpInput}
-                        onChange={(e) => setOtpInput(e.target.value.replace(/\D/g, ''))}
-                        placeholder="••••"
-                        className="flex-1 px-3 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-center font-mono text-lg font-black tracking-widest text-emerald-400 focus:outline-none focus:border-emerald-500"
-                      />
-                      <button
-                        type="button"
-                        onClick={handleVerifyOtp}
-                        disabled={otpInput.length !== 4}
-                        className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:bg-zinc-800 disabled:text-zinc-500 text-black font-black text-xs shadow-md transition-all shrink-0"
-                      >
-                        Tasdiqlash
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Tezkor Anonim Kirish yordamchisi */}
-                  <div className="pt-2 border-t border-zinc-800/80 flex flex-col gap-2 text-[11px]">
-                    <button
-                      type="button"
-                      onClick={handleAnonymousLogin}
-                      className="w-full py-2 px-3 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 hover:text-emerald-400 font-bold flex items-center justify-center gap-1.5 transition-all"
-                    >
-                      <span>🎭 Kod kelmadimi? Anonim rejimda davom etish</span>
-                    </button>
-                  </div>
-                </div>
-              )}
 
               <div className="grid grid-cols-2 gap-2.5">
                 <div>
@@ -1195,7 +1057,7 @@ export default function App() {
                 </select>
               </div>
 
-              <div className="space-y-3 pt-2">
+              <div className="pt-2">
                 <button
                   type="button"
                   onClick={() => {
@@ -1208,19 +1070,13 @@ export default function App() {
                     const age = ageInput ? ageInput.value.trim() : userProfile.age;
                     const village = villageInput ? villageInput.value : userProfile.village;
                     const sport = sportInput ? sportInput.value : userProfile.primarySport;
-                    const phone = phoneDigits ? ('+998 ' + formatPhoneDisplay(phoneDigits)) : userProfile.phone;
 
                     if (!name) {
-                      showToast("Ismingizni kiriting!", "error");
+                      showToast("Iltimos, ismingizni kiriting!", "error");
                       return;
                     }
 
-                    if (!isPhoneVerified) {
-                      showToast("Telefon raqamingizni tasdiqlang yoki 'Anonim kirish' tugmasini bosing!", "error");
-                      return;
-                    }
-
-                    const up = { ...userProfile, name, phone, age, village, primarySport: sport, verified: true };
+                    const up = { ...userProfile, name, phone: "Ko'rsatilmagan", age, village, primarySport: sport, verified: true };
                     setUserProfile(up);
                     setSelectedSport(sport);
                     setSelectedVillage(village);
@@ -1235,22 +1091,6 @@ export default function App() {
                 >
                   <span>Keyingi: Xaritada joylashuvni tanlash</span>
                   <ArrowRight className="w-4 h-4" />
-                </button>
-
-                {/* YOKI ANONIM KIRISH TUGMASI (KODSIZ VA TO'LIQ MAXFIY) */}
-                <div className="relative flex py-1 items-center">
-                  <div className="flex-grow border-t border-zinc-800"></div>
-                  <span className="flex-shrink mx-4 text-[10px] text-zinc-500 font-bold uppercase tracking-wider">YOKI</span>
-                  <div className="flex-grow border-t border-zinc-800"></div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleAnonymousLogin}
-                  className="w-full py-3 rounded-2xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 hover:border-emerald-500/50 text-zinc-200 font-extrabold text-xs shadow transition-all flex items-center justify-center gap-2 group"
-                >
-                  <span className="text-base group-hover:scale-110 transition-transform">🎭</span>
-                  <span>To'liq anonim kirish (Kod talab qilinmaydi)</span>
                 </button>
               </div>
             </div>
@@ -1419,8 +1259,14 @@ export default function App() {
                   </button>
                 </div>
 
-                <button onClick={() => setIsProfileSidebarOpen(true)} className="p-1 rounded-xl border border-zinc-700 bg-zinc-800">
-                  <img src={userProfile.avatar} alt="User" className="w-7 h-7 rounded-lg object-cover" />
+                <button onClick={() => setIsProfileSidebarOpen(true)} className="p-1 rounded-xl border border-zinc-700 bg-zinc-800 flex items-center justify-center">
+                  {userProfile.avatar ? (
+                    <img src={userProfile.avatar} alt="User" className="w-7 h-7 rounded-lg object-cover" />
+                  ) : (
+                    <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                      <User className="w-4 h-4" />
+                    </div>
+                  )}
                 </button>
               </div>
             </div>
@@ -2227,7 +2073,13 @@ export default function App() {
             </div>
 
             <div className="flex items-center gap-3 p-3 rounded-2xl bg-zinc-950/40 border border-zinc-800">
-              <img src={userProfile.avatar} alt="User" className="w-16 h-16 rounded-full object-cover border-2 border-emerald-400" />
+              {userProfile.avatar ? (
+                <img src={userProfile.avatar} alt="User" className="w-16 h-16 rounded-full object-cover border-2 border-emerald-400" />
+              ) : (
+                <div className="w-16 h-16 rounded-full bg-emerald-500/10 border-2 border-dashed border-emerald-500/40 flex items-center justify-center text-emerald-400">
+                  <User className="w-8 h-8" />
+                </div>
+              )}
               <div>
                 <h4 className="font-black text-sm">{userProfile.name}</h4>
                 <p className="text-xs text-zinc-400 flex items-center gap-1">
