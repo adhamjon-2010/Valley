@@ -6,8 +6,26 @@ import {
   Eye, RefreshCw, Award, ArrowUpRight, Zap, Sparkles, Building2,
   Sun, Moon, Compass, Navigation, Layers, ChevronDown, Trophy,
   Activity, Share2, Map as MapIcon, Crosshair, ArrowRight, Lock,
-  Unlock, LogOut, BarChart3, TrendingUp, Smartphone, Laptop
+  Unlock, LogOut, BarChart3, TrendingUp, Smartphone, Laptop,
+  KeyRound, Send, MessageSquareCheck, ShieldCheck
 } from 'lucide-react';
+
+// O'zbekiston mobil operatorlari ro'yxati
+const UZ_OPERATORS = {
+  '90': 'Beeline',
+  '91': 'Beeline',
+  '93': 'Ucell',
+  '94': 'Ucell',
+  '50': 'Ucell',
+  '97': 'Mobiuz',
+  '88': 'Mobiuz',
+  '99': 'Uztelecom',
+  '95': 'Uztelecom',
+  '77': 'Uztelecom',
+  '33': 'Humans',
+  '20': 'OQ',
+  '98': 'Perfectum'
+};
 
 // ============================================================================
 // BOSHLANG'ICH MA'LUMOTLAR
@@ -43,16 +61,16 @@ const INITIAL_VENUES = [
     category: 'Futbol',
     sport: 'Futbol',
     village: 'Vodil',
-    address: "Vodil soya bo'yi, Dam olish xiyoboni yonida",
+    address: "Vodil dam olish xiyoboni bo'yi",
     pricePerHour: 160000,
     rating: 4.9,
     image: 'https://images.unsplash.com/photo-1529900748604-07564a03e7a6?auto=format&fit=crop&w=800&q=80',
-    facilities: ["50mm sun'iy chim", "Projektorli tungi yoritish", "Kiyinish xonasi", "Muzdek ichimliklar", "Avtoturargoh"],
+    facilities: ["50mm sun'iy chim", "Projektorli tungi yoritish", "Kiyinish xonasi", "Muzdek ichimliklar"],
     contactPerson: {
       name: "Qodirov Rustam aka",
-      role: "Maydon boshlig'i va asoschisi",
+      role: "Maydon boshlig'i",
       phone: "+998 91 670-88-99",
-      workHours: "07:00 - 01:00 (Haftaning 7 kuni)",
+      workHours: "07:00 - 01:00",
       avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80"
     },
     coords: { x: 42, y: 80 },
@@ -60,16 +78,16 @@ const INITIAL_VENUES = [
   },
   {
     id: 'v3',
-    name: "Yoshlarobod Yoshlar Sport Majmuasi",
+    name: "Yoshlarobod Sport Majmuasi",
     type: 'football_pitch',
     category: 'Futbol / Voleybol',
     sport: 'Futbol',
     village: 'Yoshlarobod',
-    address: "Yoshlarobod MFY, Markaziy shoh ko'cha",
+    address: "Yoshlarobod MFY markazi",
     pricePerHour: 120000,
     rating: 4.7,
     image: 'https://images.unsplash.com/photo-1518091043644-c1d4457512c6?auto=format&fit=crop&w=800&q=80',
-    facilities: ["Yopiq futbol maydoni", "Mini voleybol zonasi", "Avtoturargoh", "Dush va sauna"],
+    facilities: ["Yopiq futbol maydoni", "Mini voleybol zonasi", "Avtoturargoh"],
     contactPerson: {
       name: "Mirzayev Farhod",
       role: "Majmua boshqaruvchisi",
@@ -91,7 +109,7 @@ const INITIAL_VENUES = [
     pricePerHour: 80000,
     rating: 4.6,
     image: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=800&q=80',
-    facilities: ["Voleybol to'ri", "Basketbol shitlari", "Issiq dush", "Yoritish"],
+    facilities: ["Voleybol to'ri", "Basketbol shitlari", "Issiq dush"],
     contactPerson: {
       name: "Tursunov Akbar",
       role: "Jismoniy tarbiya rahbari",
@@ -109,11 +127,11 @@ const INITIAL_VENUES = [
     category: 'Voleybol / Basketbol',
     sport: 'Basketbol',
     village: 'Novkat',
-    address: "Novkat qishloq fuqarolar yig'ini, 19-maktab binosi",
+    address: "Novkat QFY, 19-maktab binosi",
     pricePerHour: 90000,
     rating: 4.7,
     image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=800&q=80',
-    facilities: ["Keng zal 24x12m", "Tribunalar", "Voleybol jihozlari", "Dush"],
+    facilities: ["Keng zal 24x12m", "Tribunalar", "Voleybol jihozlari"],
     contactPerson: {
       name: "Xoliqov Bahodir",
       role: "Sport to'garagi murabbiyi",
@@ -131,11 +149,11 @@ const INITIAL_VENUES = [
     category: 'Futbol',
     sport: 'Futbol',
     village: 'Novkat',
-    address: "Novkat bog'dorchilik hududi, Katta Farg'ona kanali bo'yi",
+    address: "Novkat, Kanal bo'yi",
     pricePerHour: 140000,
     rating: 4.9,
     image: 'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?auto=format&fit=crop&w=800&q=80',
-    facilities: ["Yangi zamonaviy chim", "Kuchli yoritish", "Kiyinish xonasi", "Choyxona"],
+    facilities: ["Yangi zamonaviy chim", "Kuchli yoritish", "Kiyinish xonasi"],
     contactPerson: {
       name: "Karimov Otabek",
       role: "Maydon boshqaruvchisi",
@@ -168,10 +186,7 @@ const INITIAL_GAMES = [
       { id: 'p2', name: "Jasur Komilov", phone: "+998 91 334-11-22", status: "To'langan", method: "Click", avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=120&q=80" },
       { id: 'p3', name: "Sanjar Mahmudov", phone: "+998 93 456-78-90", status: "Naqd", method: "Naqd", avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=120&q=80" },
       { id: 'p4', name: "Otabek G'aniyev", phone: "+998 90 887-65-43", status: "Kutilmoqda", method: "Naqd", avatar: "https://images.unsplash.com/photo-1628157582853-a796fa650a6a?auto=format&fit=crop&w=120&q=80" },
-      { id: 'p5', name: "Dilmurod Ismoilov", phone: "+998 94 221-33-44", status: "To'langan", method: "Payme", avatar: "https://images.unsplash.com/photo-1527980965255-d3b416303d12?auto=format&fit=crop&w=120&q=80" },
-      { id: 'p6', name: "Bobur Zokirov", phone: "+998 90 654-32-10", status: "To'langan", method: "Click", avatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=120&q=80" },
-      { id: 'p7', name: "Sherzod Aliyev", phone: "+998 91 998-77-66", status: "Naqd", method: "Naqd", avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=120&q=80" },
-      { id: 'p8', name: "Eldor Qosimov", phone: "+998 93 112-23-34", status: "Kutilmoqda", method: "Kutilmoqda", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80" }
+      { id: 'p5', name: "Dilmurod Ismoilov", phone: "+998 94 221-33-44", status: "To'langan", method: "Payme", avatar: "https://images.unsplash.com/photo-1527980965255-d3b416303d12?auto=format&fit=crop&w=120&q=80" }
     ]
   },
   {
@@ -190,9 +205,7 @@ const INITIAL_GAMES = [
     creator: "Tursunov Akbar (Murabbiy)",
     participants: [
       { id: 'p20', name: "Tursunov Akbar", phone: "+998 90 300-85-41", status: "To'langan", method: "Bepul", avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=120&q=80" },
-      { id: 'p21', name: "Anvar Jo'rayev", phone: "+998 91 555-43-21", status: "To'langan", method: "Bepul", avatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=120&q=80" },
-      { id: 'p22', name: "Davron Salimov", phone: "+998 93 777-88-99", status: "To'langan", method: "Bepul", avatar: "https://images.unsplash.com/photo-1527980965255-d3b416303d12?auto=format&fit=crop&w=120&q=80" },
-      { id: 'p23', name: "Mirjalol Shokirov", phone: "+998 90 444-12-34", status: "To'langan", method: "Bepul", avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80" }
+      { id: 'p21', name: "Anvar Jo'rayev", phone: "+998 91 555-43-21", status: "To'langan", method: "Bepul", avatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=120&q=80" }
     ]
   },
   {
@@ -211,8 +224,7 @@ const INITIAL_GAMES = [
     creator: "Sarvar Usmonov",
     participants: [
       { id: 'p10', name: "Sarvar Usmonov", phone: "+998 90 555-11-22", status: "To'langan", method: "Click", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80" },
-      { id: 'p11', name: "Ulug'bek Tohirov", phone: "+998 91 223-34-45", status: "To'langan", method: "Payme", avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=120&q=80" },
-      { id: 'p12', name: "Nodirbek Sobirov", phone: "+998 94 667-89-01", status: "Naqd", method: "Naqd", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" }
+      { id: 'p11', name: "Ulug'bek Tohirov", phone: "+998 91 223-34-45", status: "To'langan", method: "Payme", avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=120&q=80" }
     ]
   },
   {
@@ -230,40 +242,38 @@ const INITIAL_GAMES = [
     level: "O'rta daraja",
     creator: "Xoliqov Bahodir",
     participants: [
-      { id: 'p30', name: "Xoliqov Bahodir", phone: "+998 91 114-63-52", status: "To'langan", method: "Naqd", avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=120&q=80" },
-      { id: 'p31', name: "Kamron Rustamov", phone: "+998 90 222-33-44", status: "To'langan", method: "Click", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80" },
-      { id: 'p32', name: "Shoxrux Bekmurodov", phone: "+998 93 888-99-00", status: "Kutilmoqda", method: "Naqd", avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=120&q=80" }
+      { id: 'p30', name: "Xoliqov Bahodir", phone: "+998 91 114-63-52", status: "To'langan", method: "Naqd", avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=120&q=80" }
     ]
   }
 ];
 
 export default function App() {
-  // THEME: 'dark' | 'light'
   const [theme, setTheme] = useState(() => localStorage.getItem('fs_theme') || 'dark');
-
-  // BOSQICHLAR (STEPS): 1: Kirish (Ism, Nomer), 2: Joylashuv, 3: Asosiy Ilova
-  const [appStep, setAppStep] = useState(() => {
-    return localStorage.getItem('fs_user_logged_in') ? 3 : 1;
-  });
-
-  // Profil Drawer
+  const [appStep, setAppStep] = useState(() => localStorage.getItem('fs_user_logged_in') ? 3 : 1);
   const [isProfileSidebarOpen, setIsProfileSidebarOpen] = useState(false);
-
-  // 3D Harita Rejimi
   const [is3DMapMode, setIs3DMapMode] = useState(true);
   const [mapRotation, setMapRotation] = useState({ x: 50, z: -20 });
-
-  // Navigation & Role State
-  const [activeTab, setActiveTab] = useState('home'); // 'home', 'admin_hall', 'admin_super'
+  const [activeTab, setActiveTab] = useState('home');
   const [currentRole, setCurrentRole] = useState('user');
 
-  // BOSH ADMIN ANONIM XAVFSIZLIK HOLATLARI
+  // ANONIM BOSH ADMIN PAROL (admin2010)
   const [isSuperAdminUnlocked, setIsSuperAdminUnlocked] = useState(false);
   const [isSuperAdminModalOpen, setIsSuperAdminModalOpen] = useState(false);
   const [adminPasswordInput, setAdminPasswordInput] = useState('');
   const [adminPasswordError, setAdminPasswordError] = useState(false);
 
-  // TASHRIFLAR VA FOYDALANUVCHILAR HISOBOTI STATISTIKASI (Super Admin uchun)
+  // TELEFON RAQAMINI HAQIQIY EKANLIGINI TEKSHIRISH VA SMS KOD TIZIMI
+  const [phoneRawInput, setPhoneRawInput] = useState('');
+  const [detectedOperator, setDetectedOperator] = useState(null);
+  const [phoneError, setPhoneError] = useState('');
+  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [generatedOtp, setGeneratedOtp] = useState('');
+  const [otpInput, setOtpInput] = useState('');
+  const [isPhoneVerified, setIsPhoneVerified] = useState(false);
+  const [otpCountdown, setOtpCountdown] = useState(0);
+  const [simulatedSmsBanner, setSimulatedSmsBanner] = useState(null);
+
+  // TASHRIFLAR HISOBOTI
   const [analytics, setAnalytics] = useState(() => {
     const saved = localStorage.getItem('fs_analytics');
     if (saved) {
@@ -275,35 +285,28 @@ export default function App() {
       registeredUsers: 386,
       villageStats: { Vodil: 668, Yoshlarobod: 360, Novkat: 256 },
       recentLogs: [
-        { id: 'l1', name: "Azizbek Fayziyev", phone: "+998 90 123-45-67", village: "Vodil", device: "Mobil", time: "Hozirgina", sport: "Voleybol" },
-        { id: 'l2', name: "Jasur Komilov", phone: "+998 91 334-11-22", village: "Yoshlarobod", device: "Mobil", time: "12 daqiqa oldin", sport: "Voleybol" },
-        { id: 'l3', name: "Rustam Qodirov", phone: "+998 91 670-88-99", village: "Vodil", device: "Desktop", time: "34 daqiqa oldin", sport: "Futbol" },
-        { id: 'l4', name: "Kamron Rustamov", phone: "+998 90 222-33-44", village: "Novkat", device: "Mobil", time: "1 soat oldin", sport: "Basketbol" },
-        { id: 'l5', name: "Otabek G'aniyev", phone: "+998 90 887-65-43", village: "Vodil", device: "Mobil", time: "2 soat oldin", sport: "Voleybol" }
+        { id: 'l1', name: "Azizbek Fayziyev", phone: "+998 (90) 123-45-67", village: "Vodil", device: "Mobil", time: "Hozirgina", sport: "Voleybol" },
+        { id: 'l2', name: "Jasur Komilov", phone: "+998 (91) 334-11-22", village: "Yoshlarobod", device: "Mobil", time: "15 daqiqa oldin", sport: "Voleybol" },
+        { id: 'l3', name: "Rustam Qodirov", phone: "+998 (91) 670-88-99", village: "Vodil", device: "Desktop", time: "40 daqiqa oldin", sport: "Futbol" }
       ]
     };
   });
 
-  // Filterlar
   const [selectedSport, setSelectedSport] = useState('Voleybol');
   const [selectedVillage, setSelectedVillage] = useState('Barchasi');
 
-  // Asosiy kolleksiyalar
   const [venues, setVenues] = useState(INITIAL_VENUES);
   const [games, setGames] = useState(INITIAL_GAMES);
 
-  // Modallar
   const [selectedGame, setSelectedGame] = useState(null);
   const [selectedVenue, setSelectedVenue] = useState(null);
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
   const [isCreateGameOpen, setIsCreateGameOpen] = useState(false);
   const [isCallModalOpen, setIsCallModalOpen] = useState(null);
 
-  // Split payment calculator
   const [customSplitPlayerCount, setCustomSplitPlayerCount] = useState(10);
   const [joinPaymentMethod, setJoinPaymentMethod] = useState('Payme');
 
-  // Foydalanuvchi profili
   const [userProfile, setUserProfile] = useState(() => {
     const saved = localStorage.getItem('fs_current_user');
     if (saved) {
@@ -312,30 +315,23 @@ export default function App() {
     return {
       name: "Azizbek Fayziyev",
       age: "23",
-      phone: "+998 90 123-45-67",
+      phone: "+998 (90) 123-45-67",
       primarySport: "Voleybol",
-      skillLevel: "O'rta daraja",
       userCoords: { x: 48, y: 70 },
       village: "Vodil",
       avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=250&q=80",
       reminder2Hours: true,
       reminder30Min: true,
-      gameHistory: [
-        { id: 'h1', title: "Vodil 14-maktab Voleybol", date: "10-Sentabr, 19:30", status: "Qatnashdi" },
-        { id: 'h2', title: "Yoshlarobod Futbol Turniri", date: "07-Sentabr, 20:00", status: "Qatnashdi" },
-        { id: 'h3', title: "Novkat Markaziy Voleybol", date: "03-Sentabr, 18:00", status: "Bekor qilingan" }
-      ]
+      verified: true
     };
   });
 
-  // Toast
   const [toastMessage, setToastMessage] = useState(null);
   const showToast = (msg, type = 'success') => {
     setToastMessage({ text: msg, type });
     setTimeout(() => { setToastMessage(null); }, 3500);
   };
 
-  // Har bir yangi sessiya kirishini sanash
   useEffect(() => {
     localStorage.setItem('fs_theme', theme);
     if (theme === 'dark') {
@@ -345,8 +341,121 @@ export default function App() {
     }
   }, [theme]);
 
+  // SMS Taymer
+  useEffect(() => {
+    let interval = null;
+    if (otpCountdown > 0) {
+      interval = setInterval(() => {
+        setOtpCountdown(c => c - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [otpCountdown]);
+
+  // Telefon raqamini O'zbekiston standartida tekshirish va operatorni aniqlash
+  const handlePhoneChange = (val) => {
+    // Faqat raqamlarni ajratib olish
+    const digitsOnly = val.replace(/\D/g, '');
+    let clean = digitsOnly;
+    if (clean.startsWith('998')) {
+      clean = clean.substring(3);
+    }
+    clean = clean.substring(0, 9); // Maksimal 9 ta raqam (operator + raqam)
+
+    // Operator kodi (dastlabki 2 ta raqam)
+    const opCode = clean.substring(0, 2);
+    if (clean.length >= 2) {
+      if (UZ_OPERATORS[opCode]) {
+        setDetectedOperator(UZ_OPERATORS[opCode]);
+        setPhoneError('');
+      } else {
+        setDetectedOperator(null);
+        setPhoneError(`"${opCode}" kodi O'zbekiston mobil operatorlarida mavjud emas! (90, 91, 93, 94, 97, 88, 99, 95, 77, 33, 50)`);
+      }
+    } else {
+      setDetectedOperator(null);
+      setPhoneError('');
+    }
+
+    // Formatlash: +998 (XX) XXX-XX-XX
+    let formatted = '+998';
+    if (clean.length > 0) formatted += ' (' + clean.substring(0, 2);
+    if (clean.length >= 2) formatted += ') ';
+    if (clean.length > 2) formatted += clean.substring(2, 5);
+    if (clean.length >= 5) formatted += '-';
+    if (clean.length > 5) formatted += clean.substring(5, 7);
+    if (clean.length >= 7) formatted += '-';
+    if (clean.length > 7) formatted += clean.substring(7, 9);
+
+    setPhoneRawInput(formatted);
+    setIsPhoneVerified(false);
+  };
+
+  // Soxta raqamlarni filtrlovchi detektor
+  const isFakeNumber = (clean9Digits) => {
+    // 1. Hammasi bir xil raqam bo'lsa (masalan: 999999999, 000000000)
+    if (/^(\d)\1+$/.test(clean9Digits)) return true;
+    // 2. Ketma-ket oson sonlar (masalan: 123456789)
+    if (clean9Digits === '123456789' || clean9Digits === '987654321') return true;
+    // 3. Raqam qismi 0000000 bo'lsa
+    if (clean9Digits.substring(2) === '0000000') return true;
+    return false;
+  };
+
+  // Haqiqiy SMS yuborish / Tekshirish jarayoni
+  const handleSendSmsCode = () => {
+    const digitsOnly = phoneRawInput.replace(/\D/g, '');
+    const clean9 = digitsOnly.startsWith('998') ? digitsOnly.substring(3) : digitsOnly;
+
+    if (clean9.length !== 9) {
+      setPhoneError("Telefon raqami to'liq emas! 9 ta raqam bo'lishi shart.");
+      showToast("Telefon raqamini to'liq kiriting!", "error");
+      return;
+    }
+
+    const opCode = clean9.substring(0, 2);
+    if (!UZ_OPERATORS[opCode]) {
+      setPhoneError("Noto'g'ri operator kodi! Raqam O'zbekiston operatorlariga tegishli emas.");
+      showToast("Noto'g'ri operator kodi!", "error");
+      return;
+    }
+
+    if (isFakeNumber(clean9)) {
+      setPhoneError("Mavjud bo'lmagan soxta raqam aniqlandi! Haqiqiy telefon raqamingizni kiriting.");
+      showToast("Mavjud bo'lmagan soxta raqam!", "error");
+      return;
+    }
+
+    setPhoneError('');
+    // 4 xonali SMS kod generatsiya qilish
+    const code = Math.floor(1000 + Math.random() * 9000).toString();
+    setGeneratedOtp(code);
+    setIsOtpSent(true);
+    setOtpCountdown(60);
+
+    // Kiruvchi SMS bildirishnomasi simulyatsiyasi
+    setSimulatedSmsBanner({
+      phone: phoneRawInput,
+      code: code
+    });
+
+    showToast(`📲 Tasdiqlash kodi yuborildi: ${phoneRawInput}`);
+  };
+
+  // Kiritilgan SMS kodni tekshirish
+  const handleVerifyOtp = () => {
+    if (otpInput.trim() === generatedOtp) {
+      setIsPhoneVerified(true);
+      setPhoneError('');
+      setSimulatedSmsBanner(null);
+      showToast("✅ Telefon raqam haqiqiyligi muvaffaqiyatli tasdiqlandi!");
+    } else {
+      showToast("Xato SMS kod! Qayta tekshirib kiriting.", "error");
+    }
+  };
+
   // Bosh Admin uchun yangi tashrif qayd etish
-  const trackNewVisitor = (userObj) => {
+  const trackVisitor = (userObj) => {
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     const updated = {
       ...analytics,
@@ -367,7 +476,7 @@ export default function App() {
           time: "Hozirgina",
           sport: userObj.primarySport || "Voleybol"
         },
-        ...analytics.recentLogs.slice(0, 7)
+        ...analytics.recentLogs.slice(0, 6)
       ]
     };
     setAnalytics(updated);
@@ -391,15 +500,6 @@ export default function App() {
     }
   };
 
-  // Bosh admin sessiyasini yopish (Qulflash)
-  const handleLockSuperAdmin = () => {
-    setIsSuperAdminUnlocked(false);
-    setCurrentRole('user');
-    setActiveTab('home');
-    showToast("Bosh Admin paneli qulflandi!");
-  };
-
-  // Avatar yuklash
   const handleAvatarUpload = (e) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -413,7 +513,6 @@ export default function App() {
     }
   };
 
-  // Sport bo'yicha saralash
   const currentSportGames = useMemo(() => {
     return games.filter(g => {
       const matchSport = selectedSport === 'Barchasi' || g.sport === selectedSport;
@@ -422,12 +521,10 @@ export default function App() {
     });
   }, [games, selectedSport, selectedVillage]);
 
-  // Maydon turlari
   const schoolGyms = useMemo(() => venues.filter(v => v.type === 'school_gym'), [venues]);
   const footballPitches = useMemo(() => venues.filter(v => v.type === 'football_pitch'), [venues]);
   const basketballCourts = useMemo(() => venues.filter(v => v.type === 'basketball_court' || v.category.includes('Basketbol')), [venues]);
 
-  // O'yinga a'zo bo'lish
   const handleJoinGame = () => {
     if (!selectedGame) return;
     const exists = selectedGame.participants.some(p => p.phone === userProfile.phone);
@@ -436,7 +533,6 @@ export default function App() {
       setIsJoinModalOpen(false);
       return;
     }
-
     const newP = {
       id: 'p_' + Date.now(),
       name: userProfile.name,
@@ -445,46 +541,14 @@ export default function App() {
       method: joinPaymentMethod,
       avatar: userProfile.avatar
     };
-
     const updated = {
       ...selectedGame,
       participants: [...selectedGame.participants, newP]
     };
-
     setGames(prev => prev.map(g => g.id === selectedGame.id ? updated : g));
     setSelectedGame(updated);
     setIsJoinModalOpen(false);
     showToast(`Muvaffaqiyatli qo'shildingiz! To'lov: ${joinPaymentMethod}`);
-  };
-
-  // Zal admini status
-  const handleTogglePaymentStatus = (gameId, participantId, newStatus) => {
-    setGames(prev => prev.map(g => {
-      if (g.id !== gameId) return g;
-      return {
-        ...g,
-        participants: g.participants.map(p => p.id === participantId ? { ...p, status: newStatus } : p)
-      };
-    }));
-    showToast(`To'lov holati: ${newStatus}`);
-  };
-
-  // Bosh admin obuna yangilash
-  const handleRenewSubscription = (venueId, months) => {
-    const prices = { 1: '150,000', 3: '400,000', 6: '700,000' };
-    setVenues(prev => prev.map(v => {
-      if (v.id !== venueId) return v;
-      return {
-        ...v,
-        subscription: {
-          plan: `${months} oylik`,
-          status: 'active',
-          daysLeft: months * 30,
-          expiresAt: '2026-10-15'
-        }
-      };
-    }));
-    showToast(`${months} oylik obuna faollashtirildi (${prices[months]} so'm)!`);
   };
 
   const isDark = theme === 'dark';
@@ -503,8 +567,29 @@ export default function App() {
         </div>
       )}
 
+      {/* KELGAN SMS BILDORISHNOMA BANNERI (REAL-TIME SMS SIMULYATSIYASI) */}
+      {simulatedSmsBanner && !isPhoneVerified && (
+        <div className="fixed top-4 right-4 z-50 max-w-sm w-full p-4 rounded-2xl bg-gradient-to-r from-zinc-900 via-zinc-900 to-zinc-950 border-2 border-emerald-400 shadow-2xl animate-bounce backdrop-blur-md">
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-xl">📩</span>
+              <div>
+                <p className="text-xs font-black text-emerald-400">Yangi SMS Xabar (Farg'ona Sport)</p>
+                <p className="text-[11px] text-zinc-400">{simulatedSmsBanner.phone} raqamiga</p>
+              </div>
+            </div>
+            <button onClick={() => setSimulatedSmsBanner(null)} className="text-zinc-500 hover:text-zinc-200">✕</button>
+          </div>
+          <div className="mt-2.5 p-2 rounded-xl bg-zinc-950 border border-zinc-800 text-center">
+            <p className="text-xs text-zinc-300">Tasdiqlash kodingiz:</p>
+            <p className="text-2xl font-black font-mono tracking-widest text-emerald-400 mt-0.5">{simulatedSmsBanner.code}</p>
+            <p className="text-[10px] text-zinc-500 mt-1">Ushbu kodni kiriting va tasdiqlang</p>
+          </div>
+        </div>
+      )}
+
       {/* ========================================================================= */}
-      {/* BOSQICHLAR HEADER (BOSQICHLI ILOVA, THEME, BOSH ADMIN ANONIM QULFI)        */}
+      {/* BOSQICHLAR HEADER                                                         */}
       {/* ========================================================================= */}
       <div className={`w-full py-2 px-4 border-b ${isDark ? 'bg-zinc-950/90 border-zinc-800/80 text-zinc-400' : 'bg-zinc-100 border-zinc-200 text-zinc-600'} text-xs font-semibold`}>
         <div className="max-w-5xl mx-auto flex items-center justify-between">
@@ -514,7 +599,7 @@ export default function App() {
             </span>
             <div className="flex items-center gap-1">
               {[
-                { step: 1, label: "1. Kirish" },
+                { step: 1, label: "1. Kirish & SMS" },
                 { step: 2, label: "2. Xaritada joy" },
                 { step: 3, label: "3. Sport Ilovasi" }
               ].map(s => (
@@ -534,7 +619,7 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-2">
-            {/* MUTLAQ ANONIM BOSH ADMIN QULFI TUGMASI (Parol: admin2010) */}
+            {/* MUTLAQ ANONIM BOSH ADMIN QULFI (Parol: admin2010) */}
             <button
               onClick={() => {
                 if (isSuperAdminUnlocked) {
@@ -545,33 +630,25 @@ export default function App() {
                   setIsSuperAdminModalOpen(true);
                 }
               }}
-              className={`p-1.5 px-2.5 rounded-xl border flex items-center gap-1 text-xs font-extrabold transition-all ${
-                isSuperAdminUnlocked
-                  ? 'bg-cyan-500 text-black border-cyan-400 shadow-md'
-                  : 'bg-zinc-900/90 border-zinc-700 text-zinc-400 hover:text-cyan-400'
+              className={`p-1 px-2.5 rounded-xl border flex items-center gap-1 text-xs font-bold transition-all ${
+                isSuperAdminUnlocked ? 'bg-cyan-500 text-black border-cyan-400 shadow-md' : 'bg-zinc-900 border-zinc-700 text-zinc-400 hover:text-cyan-400'
               }`}
-              title="Anonim Bosh Admin Kirish (Parol: admin2010)"
+              title="Anonim Bosh Admin (Parol: admin2010)"
             >
               {isSuperAdminUnlocked ? <Unlock className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
-              <span className="hidden sm:inline">Bosh Admin</span>
+              <span>Bosh Admin</span>
             </button>
 
-            {/* DARK / LIGHT THEME TOGGLE */}
             <button
               onClick={() => setTheme(isDark ? 'light' : 'dark')}
-              className={`p-1.5 rounded-xl border flex items-center gap-1 text-xs font-bold ${
+              className={`p-1.5 rounded-xl border text-xs font-bold ${
                 isDark ? 'bg-zinc-900 border-zinc-700 text-amber-300' : 'bg-white border-zinc-300 text-zinc-700'
               }`}
-              title="Dark / Light rejim"
             >
               {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
 
-            {/* PROFIL TUGMASI */}
-            <button
-              onClick={() => setIsProfileSidebarOpen(true)}
-              className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-extrabold text-xs shadow"
-            >
+            <button onClick={() => setIsProfileSidebarOpen(true)} className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-extrabold text-xs shadow">
               <img src={userProfile.avatar} alt="avatar" className="w-4 h-4 rounded-full object-cover" />
               <span>Profil</span>
             </button>
@@ -580,7 +657,7 @@ export default function App() {
       </div>
 
       {/* ========================================================================= */}
-      {/* 1-BOSQICH: KIRISH QISMI - NOMER VA ISMNI MAJBURIY KIRGIZADIGAN FORM       */}
+      {/* 1-BOSQICH: NOMERNI HAQIQATDAN BORLIGINI TEKSHIRISH VA KIRISH               */}
       {/* ========================================================================= */}
       {appStep === 1 && (
         <div className="max-w-md mx-auto p-4 py-8 animate-fadeIn">
@@ -592,7 +669,7 @@ export default function App() {
             <div>
               <h2 className="text-xl font-black tracking-tight">Farg'ona Sport - Kirish</h2>
               <p className="text-xs text-zinc-400 mt-1">
-                Yoshlarobod, Vodil va Novkat sport maydonlaridan foydalanish uchun ism va telefon raqamingizni kiriting
+                Iltimos, haqiqiy telefon raqamingizni kiriting va SMS orqali tasdiqlang
               </p>
             </div>
 
@@ -605,50 +682,13 @@ export default function App() {
               </label>
             </div>
 
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                const fd = new FormData(e.currentTarget);
-                const name = (fd.get('name') || '').toString().trim();
-                const phone = (fd.get('phone') || '').toString().trim();
-                const age = (fd.get('age') || '20').toString().trim();
-                const village = (fd.get('village') || 'Vodil').toString();
-                const sport = (fd.get('sport') || 'Voleybol').toString();
-
-                if (!name || !phone) {
-                  showToast("Iltimos, ism va telefon raqamingizni to'liq kiriting!", "error");
-                  return;
-                }
-
-                const updatedUser = {
-                  ...userProfile,
-                  name,
-                  phone,
-                  age,
-                  village,
-                  primarySport: sport
-                };
-
-                setUserProfile(updatedUser);
-                setSelectedSport(sport);
-                setSelectedVillage(village);
-                localStorage.setItem('fs_current_user', JSON.stringify(updatedUser));
-                localStorage.setItem('fs_user_logged_in', 'true');
-
-                // Bosh admin hisoboti uchun yangi kiruvchini qayd qilish
-                trackNewVisitor(updatedUser);
-
-                setAppStep(2);
-                showToast(`Xush kelibsiz, ${name}! Endi xaritada turgan joyingizni belgilang.`);
-              }}
-              className="space-y-3.5 text-left text-xs"
-            >
+            <div className="space-y-4 text-left text-xs">
               <div>
                 <label className="text-zinc-400 font-bold block mb-1">Ism va familiyangiz (Majburiy):</label>
                 <div className="relative">
                   <User className="w-4 h-4 text-zinc-500 absolute left-3 top-3" />
                   <input
-                    name="name"
+                    id="login_name"
                     defaultValue={userProfile.name}
                     required
                     placeholder="Masalan: Azizbek Fayziyev"
@@ -657,25 +697,92 @@ export default function App() {
                 </div>
               </div>
 
+              {/* TELEFON RAQAM TEKSHIRUVI (O'ZBEKISTON OPERATORLARI VA SMS) */}
               <div>
-                <label className="text-zinc-400 font-bold block mb-1">Telefon raqamingiz (Majburiy):</label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-zinc-400 font-bold block">Haqiqiy telefon raqamingiz (Majburiy):</label>
+                  {detectedOperator && (
+                    <span className="text-[10px] font-black uppercase text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30">
+                      {detectedOperator}
+                    </span>
+                  )}
+                </div>
+
                 <div className="relative">
                   <Phone className="w-4 h-4 text-emerald-400 absolute left-3 top-3" />
                   <input
-                    name="phone"
-                    defaultValue={userProfile.phone}
-                    required
-                    placeholder="+998 90 123-45-67"
-                    className={`w-full pl-9 pr-3 py-2.5 rounded-xl border ${isDark ? 'bg-zinc-950 border-zinc-800' : 'bg-zinc-50 border-zinc-300'} font-semibold focus:outline-none focus:border-emerald-500`}
+                    type="tel"
+                    value={phoneRawInput || userProfile.phone}
+                    onChange={(e) => handlePhoneChange(e.target.value)}
+                    placeholder="+998 (90) 123-45-67"
+                    disabled={isPhoneVerified}
+                    className={`w-full pl-9 pr-24 py-2.5 rounded-xl border ${
+                      phoneError ? 'border-rose-500' : isPhoneVerified ? 'border-emerald-500 bg-emerald-950/20' : isDark ? 'bg-zinc-950 border-zinc-800' : 'bg-zinc-50 border-zinc-300'
+                    } font-mono font-bold text-sm focus:outline-none focus:border-emerald-500`}
                   />
+
+                  {/* SMS Kod Olish Tugmasi */}
+                  {!isPhoneVerified ? (
+                    <button
+                      type="button"
+                      onClick={handleSendSmsCode}
+                      disabled={otpCountdown > 0}
+                      className="absolute right-1.5 top-1.5 px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 disabled:bg-zinc-800 disabled:text-zinc-500 text-black text-[11px] font-black shadow transition-all"
+                    >
+                      {otpCountdown > 0 ? `${otpCountdown}s` : isOtpSent ? "Qayta kod" : "SMS kod olish"}
+                    </button>
+                  ) : (
+                    <div className="absolute right-3 top-3 flex items-center gap-1 text-emerald-400 text-xs font-black">
+                      <ShieldCheck className="w-4 h-4" />
+                      <span>Tasdiqlandi</span>
+                    </div>
+                  )}
                 </div>
+
+                {/* Xatolik xabari */}
+                {phoneError && (
+                  <p className="text-[11px] text-rose-400 mt-1 font-bold flex items-center gap-1">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    {phoneError}
+                  </p>
+                )}
               </div>
+
+              {/* SMS KOD KIRITISH MAYDONI (AGAR YUBORILGAN BO'LSA VA HALI TASDIQLANMAGAN BO'LSA) */}
+              {isOtpSent && !isPhoneVerified && (
+                <div className="p-3.5 rounded-2xl bg-zinc-950 border border-emerald-500/40 space-y-2.5 animate-fadeIn">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-emerald-400 flex items-center gap-1">
+                      <KeyRound className="w-3.5 h-3.5" /> 4 xonali SMS kodni kiriting:
+                    </span>
+                    <span className="text-[11px] text-zinc-500">Kodni yuqoridagi SMS xabardan oling</span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      maxLength={4}
+                      value={otpInput}
+                      onChange={(e) => setOtpInput(e.target.value.replace(/\D/g, ''))}
+                      placeholder="Masalan: 7492"
+                      className="flex-1 px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-700 text-center font-mono text-base font-black tracking-widest text-zinc-100 focus:outline-none focus:border-emerald-500"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleVerifyOtp}
+                      className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs shadow-md"
+                    >
+                      Tasdiqlash
+                    </button>
+                  </div>
+                </div>
+              )}
 
               <div className="grid grid-cols-2 gap-2.5">
                 <div>
                   <label className="text-zinc-400 font-bold block mb-1">Yoshingiz:</label>
                   <input
-                    name="age"
+                    id="login_age"
                     type="number"
                     defaultValue={userProfile.age}
                     min="10"
@@ -685,9 +792,9 @@ export default function App() {
                   />
                 </div>
                 <div>
-                  <label className="text-zinc-400 font-bold block mb-1">Hududingiz:</label>
+                  <label className="text-zinc-400 font-bold block mb-1">Qishlog'ingiz:</label>
                   <select
-                    name="village"
+                    id="login_village"
                     defaultValue={userProfile.village}
                     className={`w-full px-3 py-2.5 rounded-xl border ${isDark ? 'bg-zinc-950 border-zinc-800' : 'bg-zinc-50 border-zinc-300'} font-semibold`}
                   >
@@ -701,7 +808,7 @@ export default function App() {
               <div>
                 <label className="text-zinc-400 font-bold block mb-1">Qiziqqan sport turi:</label>
                 <select
-                  name="sport"
+                  id="login_sport"
                   defaultValue={userProfile.primarySport}
                   className={`w-full px-3 py-2.5 rounded-xl border ${isDark ? 'bg-zinc-950 border-zinc-800' : 'bg-zinc-50 border-zinc-300'} font-semibold`}
                 >
@@ -711,14 +818,50 @@ export default function App() {
                 </select>
               </div>
 
+              {/* Kirish Tugmasi (Faqat raqam tasdiqlanganda yoki haqiqiy bo'lganda faol) */}
               <button
-                type="submit"
+                type="button"
+                onClick={() => {
+                  const nameInput = document.getElementById('login_name');
+                  const ageInput = document.getElementById('login_age');
+                  const villageInput = document.getElementById('login_village');
+                  const sportInput = document.getElementById('login_sport');
+
+                  const name = nameInput ? nameInput.value.trim() : userProfile.name;
+                  const age = ageInput ? ageInput.value.trim() : userProfile.age;
+                  const village = villageInput ? villageInput.value : userProfile.village;
+                  const sport = sportInput ? sportInput.value : userProfile.primarySport;
+                  const phone = phoneRawInput || userProfile.phone;
+
+                  if (!name) {
+                    showToast("Ismingizni kiriting!", "error");
+                    return;
+                  }
+
+                  if (!isPhoneVerified) {
+                    // Agar hali SMS kod olmagan bo'lsa, kod olishni so'raymiz
+                    showToast("Iltimos, avval telefon raqamingizni SMS orqali tasdiqlang!", "error");
+                    handleSendSmsCode();
+                    return;
+                  }
+
+                  const up = { ...userProfile, name, phone, age, village, primarySport: sport, verified: true };
+                  setUserProfile(up);
+                  setSelectedSport(sport);
+                  setSelectedVillage(village);
+                  localStorage.setItem('fs_current_user', JSON.stringify(up));
+                  localStorage.setItem('fs_user_logged_in', 'true');
+                  trackVisitor(up);
+
+                  setAppStep(2);
+                  showToast(`Xush kelibsiz, ${name}! Raqamingiz muvaffaqiyatli tasdiqlandi.`);
+                }}
                 className="w-full py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-black text-sm shadow-xl hover:opacity-95 transition-all flex items-center justify-center gap-2 mt-3"
               >
-                <span>Keyingi: Xaritada joylashuvni belgilash</span>
+                <span>{isPhoneVerified ? "Keyingi: Xaritada joylashuvni tanlash" : "Raqamni tasdiqlash va Kirish"}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
-            </form>
+            </div>
           </div>
         </div>
       )}
@@ -769,7 +912,6 @@ export default function App() {
               ))}
             </div>
 
-            {/* Xarita joylashuv tanlash */}
             <div
               onClick={(e) => {
                 const rect = e.currentTarget.getBoundingClientRect();
@@ -804,7 +946,6 @@ export default function App() {
                 Novkat
               </div>
 
-              {/* Pin */}
               <div
                 style={{ left: `${userProfile.userCoords.x}%`, top: `${userProfile.userCoords.y}%` }}
                 className="absolute -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none"
@@ -822,10 +963,7 @@ export default function App() {
             </div>
 
             <div className="flex items-center justify-between pt-2">
-              <button
-                onClick={() => setAppStep(1)}
-                className="px-4 py-2 rounded-xl border border-zinc-700 text-xs font-bold"
-              >
+              <button onClick={() => setAppStep(1)} className="px-4 py-2 rounded-xl border border-zinc-700 text-xs font-bold">
                 Orqaga
               </button>
               <button
@@ -848,7 +986,6 @@ export default function App() {
       {/* ========================================================================= */}
       {appStep === 3 && (
         <>
-          {/* HEADER */}
           <header className={`sticky top-0 z-40 ${headerBg} backdrop-blur-md px-4 py-3 shadow-md`}>
             <div className="max-w-5xl mx-auto flex items-center justify-between gap-2">
               <div className="flex items-center gap-2.5">
@@ -866,19 +1003,12 @@ export default function App() {
                 </div>
               </div>
 
-              {/* ROL SWITCHER */}
               <div className="flex items-center gap-2">
                 <div className="flex items-center bg-zinc-800/80 p-1 rounded-xl text-xs">
-                  <button
-                    onClick={() => { setCurrentRole('user'); setActiveTab('home'); }}
-                    className={`px-2 py-1 rounded-lg font-bold ${currentRole === 'user' ? 'bg-emerald-500 text-black' : 'text-zinc-400'}`}
-                  >
+                  <button onClick={() => { setCurrentRole('user'); setActiveTab('home'); }} className={`px-2 py-1 rounded-lg font-bold ${currentRole === 'user' ? 'bg-emerald-500 text-black' : 'text-zinc-400'}`}>
                     Mijoz
                   </button>
-                  <button
-                    onClick={() => { setCurrentRole('hall_admin'); setActiveTab('admin_hall'); }}
-                    className={`px-2 py-1 rounded-lg font-bold ${currentRole === 'hall_admin' ? 'bg-amber-500 text-black' : 'text-zinc-400'}`}
-                  >
+                  <button onClick={() => { setCurrentRole('hall_admin'); setActiveTab('admin_hall'); }} className={`px-2 py-1 rounded-lg font-bold ${currentRole === 'hall_admin' ? 'bg-amber-500 text-black' : 'text-zinc-400'}`}>
                     Zal Admin
                   </button>
                   <button
@@ -890,20 +1020,14 @@ export default function App() {
                         setIsSuperAdminModalOpen(true);
                       }
                     }}
-                    className={`px-2 py-1 rounded-lg font-bold flex items-center gap-1 ${
-                      currentRole === 'super_admin' ? 'bg-cyan-400 text-black' : 'text-zinc-400'
-                    }`}
+                    className={`px-2 py-1 rounded-lg font-bold flex items-center gap-1 ${currentRole === 'super_admin' ? 'bg-cyan-400 text-black' : 'text-zinc-400'}`}
                   >
                     {isSuperAdminUnlocked ? <Unlock className="w-3 h-3" /> : <Lock className="w-3 h-3" />}
                     Bosh Admin
                   </button>
                 </div>
 
-                <button
-                  onClick={() => setIsProfileSidebarOpen(true)}
-                  className="p-1 rounded-xl border border-zinc-700 bg-zinc-800"
-                  title="Profilni ochish"
-                >
+                <button onClick={() => setIsProfileSidebarOpen(true)} className="p-1 rounded-xl border border-zinc-700 bg-zinc-800">
                   <img src={userProfile.avatar} alt="User" className="w-7 h-7 rounded-lg object-cover" />
                 </button>
               </div>
@@ -912,7 +1036,6 @@ export default function App() {
 
           <main className="max-w-5xl mx-auto p-4 pb-24 space-y-6">
 
-            {/* TAB 1: ASOSIY SAHIFA */}
             {activeTab === 'home' && (
               <>
                 {/* 3D XARITA */}
@@ -943,14 +1066,12 @@ export default function App() {
                           onClick={() => setMapRotation(p => ({ ...p, z: p.z === -20 ? 10 : -20 }))}
                           className="px-2.5 py-1.5 rounded-xl bg-zinc-800 text-zinc-200 text-xs font-bold border border-zinc-700 flex items-center gap-1"
                         >
-                          <RefreshCw className="w-3.5 h-3.5" />
-                          Burish
+                          <RefreshCw className="w-3.5 h-3.5" /> Burish
                         </button>
                       )}
                     </div>
                   </div>
 
-                  {/* 3D SATH */}
                   <div
                     style={{ perspective: '1100px' }}
                     className={`relative w-full h-80 sm:h-96 rounded-2xl overflow-hidden border ${isDark ? 'border-zinc-800 bg-[#06080e]' : 'border-zinc-300 bg-slate-100'} select-none flex items-center justify-center`}
@@ -1032,7 +1153,6 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Tanlangan maydon kartasi */}
                   {selectedVenue && (
                     <div className={`p-3.5 rounded-2xl border ${cardBg} flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-fadeIn`}>
                       <div className="flex items-center gap-3">
@@ -1166,8 +1286,6 @@ export default function App() {
 
                 {/* 2. UNI PASIGA: MAKTAB ZALLARI, SUN'IY MAYDONLAR, BASKETBOL */}
                 <div className="space-y-6 pt-4 border-t border-zinc-800">
-
-                  {/* MAKTAB ZALLARI */}
                   <div className="space-y-3">
                     <h3 className="text-sm font-black text-indigo-400 flex items-center gap-2">
                       <span>🏫 Maktab sport zallari (Voleybol va Basketbol)</span>
@@ -1197,7 +1315,6 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* SUN'IY MAYDONLAR */}
                   <div className="space-y-3">
                     <h3 className="text-sm font-black text-emerald-400 flex items-center gap-2">
                       <span>⚽ Sun'iy futbol maydonlari</span>
@@ -1227,7 +1344,6 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* BASKETBOL */}
                   <div className="space-y-3">
                     <h3 className="text-sm font-black text-amber-400 flex items-center gap-2">
                       <span>🏀 Basketbol maydonlari va Majmualar</span>
@@ -1256,12 +1372,11 @@ export default function App() {
                       ))}
                     </div>
                   </div>
-
                 </div>
               </>
             )}
 
-            {/* TAB 2: ZAL ADMINI PANELI */}
+            {/* TAB 2: ZAL ADMINI */}
             {activeTab === 'admin_hall' && (
               <div className="space-y-4 animate-fadeIn">
                 <div className={`p-5 rounded-3xl border ${cardBg} shadow-xl`}>
@@ -1278,10 +1393,20 @@ export default function App() {
                         <p className="text-[11px] text-zinc-400">Holat: {p.status} • Usul: {p.method}</p>
                       </div>
                       <div className="flex gap-1.5">
-                        <button onClick={() => handleTogglePaymentStatus(games[0].id, p.id, "To'langan")} className="px-2.5 py-1 rounded bg-emerald-500 text-black text-xs font-bold">
+                        <button onClick={() => {
+                          setGames(prev => prev.map(g => g.id === games[0].id ? {
+                            ...g, participants: g.participants.map(part => part.id === p.id ? { ...part, status: "To'langan" } : part)
+                          } : g));
+                          showToast("Qabul qilindi!");
+                        }} className="px-2.5 py-1 rounded bg-emerald-500 text-black text-xs font-bold">
                           Qabul qilindi
                         </button>
-                        <button onClick={() => handleTogglePaymentStatus(games[0].id, p.id, "To'lanmadi")} className="px-2.5 py-1 rounded bg-rose-600 text-white text-xs font-bold">
+                        <button onClick={() => {
+                          setGames(prev => prev.map(g => g.id === games[0].id ? {
+                            ...g, participants: g.participants.map(part => part.id === p.id ? { ...part, status: "To'lanmadi" } : part)
+                          } : g));
+                          showToast("To'lanmadi deb belgilandi!");
+                        }} className="px-2.5 py-1 rounded bg-rose-600 text-white text-xs font-bold">
                           To'lanmadi
                         </button>
                       </div>
@@ -1291,10 +1416,9 @@ export default function App() {
               </div>
             )}
 
-            {/* TAB 3: BOSH ADMIN PANELI (TASHRIFLAR HISOBOTI BILAN) */}
+            {/* TAB 3: BOSH ADMIN (HISOBOT BILAN) */}
             {activeTab === 'admin_super' && (
               <div className="space-y-6 animate-fadeIn">
-                {/* Header va Qulflash */}
                 <div className={`p-5 rounded-3xl border ${cardBg} shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4`}>
                   <div>
                     <div className="flex items-center gap-2">
@@ -1306,42 +1430,43 @@ export default function App() {
                       </span>
                     </div>
                     <h2 className="text-xl font-black mt-1">Platforma Boshqaruvi va Tashriflar Hisoboti</h2>
-                    <p className="text-xs text-zinc-400">Farg'ona tumani sport infratuzilmasi va foydalanuvchilar oqimi tahlili</p>
+                    <p className="text-xs text-zinc-400">Nechta odam kirgani va oqim statistikasi</p>
                   </div>
 
                   <button
-                    onClick={handleLockSuperAdmin}
-                    className="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-extrabold flex items-center gap-1.5 shadow self-start sm:self-center"
+                    onClick={() => {
+                      setIsSuperAdminUnlocked(false);
+                      setCurrentRole('user');
+                      setActiveTab('home');
+                      showToast("Bosh Admin paneli qulflandi!");
+                    }}
+                    className="px-3 py-1.5 rounded-xl bg-rose-600 text-white text-xs font-extrabold flex items-center gap-1.5 shadow"
                   >
-                    <LogOut className="w-3.5 h-3.5" />
-                    Chiqish (Qulflash)
+                    <LogOut className="w-3.5 h-3.5" /> Qulflash (Chiqish)
                   </button>
                 </div>
 
-                {/* NECHTA ODAM KIRGANI HAQIDA HISOBOT (VISITOR ANALYTICS) */}
+                {/* NECHTA ODAM KIRGANI HAQIDA HISOBOT */}
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <h3 className="text-base font-black flex items-center gap-2">
                       <BarChart3 className="w-5 h-5 text-cyan-400" />
                       Foydalanuvchilar tashrifi va odamlar kirishi hisoboti
                     </h3>
-                    <span className="text-xs text-zinc-400">Real-time ma'lumotlar</span>
+                    <span className="text-xs text-emerald-400 font-bold">Onlayn hisoblagich</span>
                   </div>
 
-                  {/* KPI Kartalari */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     <div className={`p-4 rounded-2xl border ${cardBg} space-y-1`}>
                       <span className="text-[11px] text-zinc-400 font-semibold block">Jami kirganlar soni:</span>
                       <p className="text-2xl font-black text-cyan-400">{analytics.totalVisitors.toLocaleString()}</p>
-                      <span className="text-[10px] text-emerald-400 font-bold flex items-center gap-0.5">
-                        <TrendingUp className="w-3 h-3" /> +14% o'sish
-                      </span>
+                      <span className="text-[10px] text-emerald-400 font-bold">+14% o'sish</span>
                     </div>
 
                     <div className={`p-4 rounded-2xl border ${cardBg} space-y-1`}>
                       <span className="text-[11px] text-zinc-400 font-semibold block">Bugungi tashriflar:</span>
                       <p className="text-2xl font-black text-emerald-400">{analytics.todayVisitors.toLocaleString()}</p>
-                      <span className="text-[10px] text-zinc-500 font-medium">Faol foydalanuvchilar</span>
+                      <span className="text-[10px] text-zinc-500 font-medium">Faol odamlar</span>
                     </div>
 
                     <div className={`p-4 rounded-2xl border ${cardBg} space-y-1`}>
@@ -1353,11 +1478,11 @@ export default function App() {
                     <div className={`p-4 rounded-2xl border ${cardBg} space-y-1`}>
                       <span className="text-[11px] text-zinc-400 font-semibold block">Oylik obuna tushumi:</span>
                       <p className="text-2xl font-black text-emerald-400">2,450,000</p>
-                      <span className="text-[10px] text-zinc-500 font-medium">so'm (Zallar to'lovi)</span>
+                      <span className="text-[10px] text-zinc-500 font-medium">so'm</span>
                     </div>
                   </div>
 
-                  {/* Qishloqlar kesimida taqsimot */}
+                  {/* Qishloqlar ulushi */}
                   <div className={`p-4 rounded-2xl border ${cardBg} space-y-3`}>
                     <h4 className="text-xs font-black uppercase tracking-wide text-zinc-400">
                       Qishloqlar bo'yicha kiruvchilar ulushi (Vodil, Yoshlarobod, Novkat):
@@ -1395,30 +1520,21 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Oxirgi kirgan foydalanuvchilar ro'yxati */}
+                  {/* Loglar */}
                   <div className={`rounded-2xl border ${cardBg} overflow-hidden`}>
-                    <div className="p-3.5 border-b border-zinc-800 flex items-center justify-between">
-                      <h4 className="text-xs font-black uppercase text-zinc-400">So'nggi kirgan va ro'yxatdan o'tgan odamlar logi</h4>
-                      <span className="text-[10px] text-emerald-400 font-bold">Onlayn rejimda</span>
+                    <div className="p-3 border-b border-zinc-800 flex items-center justify-between">
+                      <h4 className="text-xs font-black uppercase text-zinc-400">So'nggi kirgan va tasdiqlangan foydalanuvchilar oqimi</h4>
+                      <span className="text-[10px] text-emerald-400 font-bold">Real-time log</span>
                     </div>
-
-                    <div className="divide-y divide-zinc-800/70">
-                      {analytics.recentLogs.map((log) => (
+                    <div className="divide-y divide-zinc-800">
+                      {analytics.recentLogs.map(log => (
                         <div key={log.id} className="p-3 flex items-center justify-between text-xs">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center font-bold text-xs">
-                              {log.device === "Mobil" ? <Smartphone className="w-4 h-4 text-emerald-400" /> : <Laptop className="w-4 h-4 text-cyan-400" />}
-                            </div>
-                            <div>
-                              <p className="font-bold text-zinc-200">{log.name}</p>
-                              <p className="text-[11px] text-zinc-400">{log.phone} • {log.village} ({log.device})</p>
-                            </div>
+                          <div>
+                            <p className="font-bold">{log.name} ({log.phone})</p>
+                            <p className="text-[11px] text-zinc-400">{log.village} • {log.device}</p>
                           </div>
-
                           <div className="text-right">
-                            <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">
-                              {log.sport}
-                            </span>
+                            <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">{log.sport}</span>
                             <p className="text-[10px] text-zinc-500 mt-0.5">{log.time}</p>
                           </div>
                         </div>
@@ -1427,7 +1543,7 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Maydonlarga obuna sotish */}
+                {/* Obunalar */}
                 <div className="space-y-3 pt-4 border-t border-zinc-800">
                   <h3 className="text-sm font-black">Maydon egalariga adminlik obunalarini sotish va boshqarish</h3>
                   <div className={`rounded-2xl border ${cardBg} divide-y divide-zinc-800`}>
@@ -1438,9 +1554,24 @@ export default function App() {
                           <p className="text-[11px] text-zinc-400">Obuna: {v.subscription.status} • {v.subscription.daysLeft} kun qoldi</p>
                         </div>
                         <div className="flex gap-1.5">
-                          <button onClick={() => handleRenewSubscription(v.id, 1)} className="px-2 py-1 rounded bg-zinc-800 text-xs font-bold">+1 oy (150k)</button>
-                          <button onClick={() => handleRenewSubscription(v.id, 3)} className="px-2 py-1 rounded bg-zinc-800 text-cyan-400 text-xs font-bold">+3 oy (400k)</button>
-                          <button onClick={() => handleRenewSubscription(v.id, 6)} className="px-2 py-1 rounded bg-emerald-500 text-black text-xs font-bold">+6 oy (700k)</button>
+                          <button onClick={() => {
+                            setVenues(prev => prev.map(ven => ven.id === v.id ? {
+                              ...ven, subscription: { ...ven.subscription, daysLeft: ven.subscription.daysLeft + 30, status: 'active' }
+                            } : ven));
+                            showToast("+1 oy qo'shildi!");
+                          }} className="px-2 py-1 rounded bg-zinc-800 text-xs font-bold">+1 oy (150k)</button>
+                          <button onClick={() => {
+                            setVenues(prev => prev.map(ven => ven.id === v.id ? {
+                              ...ven, subscription: { ...ven.subscription, daysLeft: ven.subscription.daysLeft + 90, status: 'active' }
+                            } : ven));
+                            showToast("+3 oy qo'shildi!");
+                          }} className="px-2 py-1 rounded bg-zinc-800 text-cyan-400 text-xs font-bold">+3 oy (400k)</button>
+                          <button onClick={() => {
+                            setVenues(prev => prev.map(ven => ven.id === v.id ? {
+                              ...ven, subscription: { ...ven.subscription, daysLeft: ven.subscription.daysLeft + 180, status: 'active' }
+                            } : ven));
+                            showToast("+6 oy qo'shildi!");
+                          }} className="px-2 py-1 rounded bg-emerald-500 text-black text-xs font-bold">+6 oy (700k)</button>
                         </div>
                       </div>
                     ))}
@@ -1453,60 +1584,36 @@ export default function App() {
         </>
       )}
 
-      {/* ========================================================================= */}
-      {/* 4. MUTLAQ ANONIM BOSH ADMIN PAROL MODALI (admin2010)                       */}
-      {/* ========================================================================= */}
+      {/* MUTLAQ ANONIM BOSH ADMIN PAROL MODALI (admin2010) */}
       {isSuperAdminModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
           <div className="w-full max-w-sm rounded-3xl bg-zinc-900 border border-zinc-800 p-6 space-y-4 shadow-2xl text-center text-zinc-100">
-            <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 border border-cyan-500/40 text-cyan-400 flex items-center justify-center mx-auto">
+            <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center mx-auto">
               <Lock className="w-6 h-6" />
             </div>
-
             <div>
               <h3 className="text-base font-black">Bosh Admin Xavfsiz Kirish</h3>
-              <p className="text-xs text-zinc-400 mt-1">
-                Tizim hisobotlari va obuna nazorati faqat maxsus parol orqali ochiladi
-              </p>
+              <p className="text-xs text-zinc-400 mt-1">Hisobotlar va nazorat faqat maxsus parol bilan ochiladi</p>
             </div>
 
             <form onSubmit={handleSuperAdminLogin} className="space-y-3">
-              <div>
-                <input
-                  type="password"
-                  value={adminPasswordInput}
-                  onChange={(e) => {
-                    setAdminPasswordInput(e.target.value);
-                    setAdminPasswordError(false);
-                  }}
-                  placeholder="Maxfiy parolni kiriting..."
-                  required
-                  autoFocus
-                  className={`w-full px-4 py-2.5 rounded-xl bg-zinc-950 border ${
-                    adminPasswordError ? 'border-rose-500 ring-2 ring-rose-500/20' : 'border-zinc-800'
-                  } text-center font-mono text-sm tracking-widest text-zinc-100 focus:outline-none focus:border-cyan-400`}
-                />
-                {adminPasswordError && (
-                  <p className="text-[11px] text-rose-400 mt-1 font-semibold">Xato parol! Qayta urinib ko'ring.</p>
-                )}
-              </div>
-
+              <input
+                type="password"
+                value={adminPasswordInput}
+                onChange={(e) => { setAdminPasswordInput(e.target.value); setAdminPasswordError(false); }}
+                placeholder="Maxfiy parolni kiriting..."
+                required
+                autoFocus
+                className={`w-full px-4 py-2.5 rounded-xl bg-zinc-950 border ${adminPasswordError ? 'border-rose-500 ring-2 ring-rose-500/20' : 'border-zinc-800'} text-center font-mono text-sm tracking-widest text-zinc-100 focus:outline-none`}
+              />
+              {adminPasswordError && (
+                <p className="text-[11px] text-rose-400 font-bold">Xato parol! Qayta urinib ko'ring.</p>
+              )}
               <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsSuperAdminModalOpen(false);
-                    setAdminPasswordInput('');
-                    setAdminPasswordError(false);
-                  }}
-                  className="flex-1 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 text-xs font-bold"
-                >
+                <button type="button" onClick={() => { setIsSuperAdminModalOpen(false); setAdminPasswordInput(''); setAdminPasswordError(false); }} className="flex-1 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 text-xs font-bold">
                   Bekor qilish
                 </button>
-                <button
-                  type="submit"
-                  className="flex-1 py-2.5 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-black text-xs font-black shadow-lg"
-                >
+                <button type="submit" className="flex-1 py-2.5 rounded-xl bg-cyan-400 text-black text-xs font-black shadow-lg">
                   Tasdiqlash
                 </button>
               </div>
@@ -1515,9 +1622,7 @@ export default function App() {
         </div>
       )}
 
-      {/* ========================================================================= */}
-      {/* 5. YON PROFIL DRAWER                                                      */}
-      {/* ========================================================================= */}
+      {/* YON PROFIL DRAWER */}
       {isProfileSidebarOpen && (
         <div className="fixed inset-0 z-50 flex justify-end bg-black/75 backdrop-blur-sm animate-fadeIn">
           <div className={`w-full max-w-sm h-full ${isDark ? 'bg-zinc-900 text-zinc-100' : 'bg-white text-zinc-900'} border-l border-zinc-800 p-5 space-y-5 overflow-y-auto animate-slideLeft`}>
@@ -1529,21 +1634,17 @@ export default function App() {
             </div>
 
             <div className="flex items-center gap-3 p-3 rounded-2xl bg-zinc-950/40 border border-zinc-800">
-              <div className="relative">
-                <img src={userProfile.avatar} alt="User" className="w-16 h-16 rounded-full object-cover border-2 border-emerald-400" />
-                <label className="absolute bottom-0 right-0 p-1 rounded-full bg-emerald-500 text-black cursor-pointer shadow">
-                  <Camera className="w-3.5 h-3.5" />
-                  <input type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" />
-                </label>
-              </div>
+              <img src={userProfile.avatar} alt="User" className="w-16 h-16 rounded-full object-cover border-2 border-emerald-400" />
               <div>
                 <h4 className="font-black text-sm">{userProfile.name}</h4>
-                <p className="text-xs text-zinc-400">{userProfile.phone}</p>
+                <p className="text-xs text-zinc-400 flex items-center gap-1">
+                  <span>{userProfile.phone}</span>
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" title="Raqam tasdiqlangan" />
+                </p>
                 <p className="text-xs text-emerald-400 font-bold">{userProfile.age} yosh • {userProfile.village}</p>
               </div>
             </div>
 
-            {/* Eslatmalar */}
             <div className="p-4 rounded-2xl bg-zinc-950/40 border border-zinc-800 space-y-3">
               <p className="text-xs font-bold text-amber-400 flex items-center gap-1.5">
                 <Bell className="w-4 h-4" /> Avtomatik Eslatmalar
@@ -1582,22 +1683,14 @@ export default function App() {
               </div>
             </div>
 
-            <button
-              onClick={() => {
-                setAppStep(1);
-                setIsProfileSidebarOpen(false);
-              }}
-              className="w-full py-2.5 rounded-xl bg-zinc-800 text-xs font-bold"
-            >
-              Ma'lumotlarni qayta tahrirlash (Kirish)
+            <button onClick={() => { setAppStep(1); setIsProfileSidebarOpen(false); }} className="w-full py-2.5 rounded-xl bg-zinc-800 text-xs font-bold">
+              Raqamni qayta tasdiqlash (Kirish)
             </button>
           </div>
         </div>
       )}
 
-      {/* ========================================================================= */}
-      {/* 6. MODALLAR: O'YIN TAFSILOTLARI VA TO'LOV HISOB-KITOBLARI                  */}
-      {/* ========================================================================= */}
+      {/* O'YIN TAFSILOTLARI MODALI */}
       {selectedGame && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/85 backdrop-blur-sm animate-fadeIn">
           <div className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-zinc-900 border border-zinc-800 p-5 space-y-4 shadow-2xl text-zinc-100">
@@ -1626,7 +1719,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* Split hisoblagich */}
             {!selectedGame.isFree && (
               <div className="p-3.5 rounded-xl bg-zinc-950 border border-amber-500/30 space-y-2">
                 <span className="text-xs font-bold text-zinc-200 flex items-center gap-1">
@@ -1651,7 +1743,6 @@ export default function App() {
               </div>
             )}
 
-            {/* Qatnashchilar */}
             <div className="space-y-2">
               <div className="flex justify-between text-xs">
                 <span className="font-bold">Qatnashchilar ({selectedGame.participants.length}/{selectedGame.maxPlayers}):</span>
@@ -1675,10 +1766,7 @@ export default function App() {
               </div>
             </div>
 
-            <button
-              onClick={() => setIsJoinModalOpen(true)}
-              className="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-extrabold text-xs shadow-lg"
-            >
+            <button onClick={() => setIsJoinModalOpen(true)} className="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-extrabold text-xs shadow-lg">
               O'yinga qo'shilish va to'lash
             </button>
           </div>
@@ -1735,7 +1823,7 @@ export default function App() {
         </div>
       )}
 
-      {/* YANGI O'YIN TASHKIL QILISH MODALI */}
+      {/* YANGI O'YIN MODALI */}
       {isCreateGameOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
           <div className="w-full max-w-md rounded-3xl bg-zinc-900 border border-zinc-800 p-5 space-y-3 text-zinc-100">
