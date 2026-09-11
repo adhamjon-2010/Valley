@@ -556,23 +556,65 @@
       });
       const [otpCountdown, setOtpCountdown] = useState(0);
 
-      // TASHRIFLAR HISOBOTI (ANALYTICS)
+      // HAQIQIY TASHRIFLAR VA FOYDALANUVCHILARNI TOZALASH FUNKSIYASI (YOLG'ON STATISTIKASIZ)
+      const cleanRealAnalytics = (savedRaw) => {
+        const defaultClean = {
+          totalVisitors: 1,
+          todayVisitors: 1,
+          registeredUsers: 0,
+          subscriptionRevenue: 0,
+          villageStats: { "Farg'ona": 0, "Vodil": 0, "Yoshlarobod": 0, "Novkat": 0 },
+          recentLogs: []
+        };
+        if (!savedRaw) return defaultClean;
+        try {
+          const parsed = typeof savedRaw === 'string' ? JSON.parse(savedRaw) : savedRaw;
+          if (!parsed || typeof parsed !== 'object') return defaultClean;
+
+          // Soxta/dummy foydalanuvchilarni qat'iy chiqarib tashlash (Azizbek Fayziyev, Jasur Komilov, Rustam Qodirov, l1, l2, l3)
+          const realLogs = (parsed.recentLogs || []).filter(l => {
+            if (!l) return false;
+            if (l.id === 'l1' || l.id === 'l2' || l.id === 'l3') return false;
+            const nm = (l.name || '').trim().toLowerCase();
+            if (nm === 'azizbek fayziyev' || nm === 'jasur komilov' || nm === 'rustam qodirov') return false;
+            return true;
+          });
+
+          // Qishloq va shaharlar bo'yicha haqiqiy sanash
+          const villageStats = { "Farg'ona": 0, "Vodil": 0, "Yoshlarobod": 0, "Novkat": 0 };
+          realLogs.forEach(l => {
+            if (l.village && villageStats[l.village] !== undefined) {
+              villageStats[l.village] += 1;
+            } else if (l.village) {
+              villageStats[l.village] = 1;
+            }
+          });
+
+          // Eski sun'iy ko'tarilgan raqamlarni (1284, 142 va h.k.) yo'qotish
+          const isInflated = (parsed.totalVisitors >= 100) || (parsed.todayVisitors >= 50) || (parsed.registeredUsers >= 50);
+          const realRegistered = realLogs.length;
+          const realTotal = isInflated ? Math.max(realRegistered, 1) : Math.max(parsed.totalVisitors || 0, realRegistered, 1);
+          const realToday = isInflated ? Math.max(realRegistered, 1) : Math.max(parsed.todayVisitors || 0, realRegistered, 1);
+
+          const cleanResult = {
+            totalVisitors: realTotal,
+            todayVisitors: realToday,
+            registeredUsers: realRegistered,
+            subscriptionRevenue: 0,
+            villageStats,
+            recentLogs: realLogs
+          };
+          localStorage.setItem('fs_analytics', JSON.stringify(cleanResult));
+          return cleanResult;
+        } catch (e) {
+          return defaultClean;
+        }
+      };
+
+      // TASHRIFLAR HISOBOTI (FAQAT HAQIQIY FOYDALANUVCHILAR)
       const [analytics, setAnalytics] = useState(() => {
         const saved = localStorage.getItem('fs_analytics');
-        if (saved) {
-          try { return JSON.parse(saved); } catch(e){}
-        }
-        return {
-          totalVisitors: 1284,
-          todayVisitors: 142,
-          registeredUsers: 386,
-          villageStats: { Vodil: 668, Yoshlarobod: 360, Novkat: 256 },
-          recentLogs: [
-            { id: 'l1', name: "Azizbek Fayziyev", phone: "+998 90 123-45-67", village: "Vodil", device: "Mobil", time: "Hozirgina", sport: "Voleybol" },
-            { id: 'l2', name: "Jasur Komilov", phone: "+998 91 334-11-22", village: "Yoshlarobod", device: "Mobil", time: "15 daqiqa oldin", sport: "Voleybol" },
-            { id: 'l3', name: "Rustam Qodirov", phone: "+998 91 670-88-99", village: "Vodil", device: "Desktop", time: "40 daqiqa oldin", sport: "Futbol" }
-          ]
-        };
+        return cleanRealAnalytics(saved);
       });
 
       const [selectedSport, setSelectedSport] = useState('Voleybol');
@@ -593,12 +635,17 @@
       const [userProfile, setUserProfile] = useState(() => {
         const saved = localStorage.getItem('fs_current_user');
         if (saved) {
-          try { return JSON.parse(saved); } catch(e){}
+          try {
+            const u = JSON.parse(saved);
+            if (u && u.name && u.name !== 'Azizbek Fayziyev') {
+              return u;
+            }
+          } catch(e){}
         }
         return {
-          name: "Azizbek Fayziyev",
+          name: "",
           age: "23",
-          phone: "+998 90 123-45-67",
+          phone: "",
           primarySport: "Voleybol",
           userCoords: { x: 48, y: 70 },
           village: "Vodil",
@@ -740,30 +787,45 @@
 
       const trackVisitor = (userObj) => {
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-        const up = {
-          ...analytics,
-          totalVisitors: analytics.totalVisitors + 1,
-          todayVisitors: analytics.todayVisitors + 1,
-          registeredUsers: analytics.registeredUsers + 1,
-          villageStats: {
-            ...analytics.villageStats,
-            [userObj.village]: (analytics.villageStats[userObj.village] || 0) + 1
-          },
-          recentLogs: [
-            {
-              id: 'l_' + Date.now(),
-              name: userObj.name,
-              phone: userObj.phone,
-              village: userObj.village,
-              device: isMobile ? "Mobil" : "Desktop",
-              time: "Hozirgina",
-              sport: userObj.primarySport || "Voleybol"
-            },
-            ...analytics.recentLogs.slice(0, 5)
-          ]
-        };
-        setAnalytics(up);
-        localStorage.setItem('fs_analytics', JSON.stringify(up));
+        const now = new Date();
+        const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+        setAnalytics(prev => {
+          const current = cleanRealAnalytics(prev);
+
+          const newLog = {
+            id: 'l_' + Date.now(),
+            name: userObj.name,
+            phone: userObj.phone,
+            village: userObj.village,
+            device: isMobile ? "Mobil" : "Desktop",
+            time: `Bugun, ${timeStr}`,
+            sport: userObj.primarySport || "Voleybol"
+          };
+
+          // Telefon raqami bo'yicha takrorlanishlarni yangilash
+          const updatedLogs = [newLog, ...current.recentLogs.filter(l => l.phone !== userObj.phone)].slice(0, 30);
+
+          const villageStats = { "Farg'ona": 0, "Vodil": 0, "Yoshlarobod": 0, "Novkat": 0 };
+          updatedLogs.forEach(l => {
+            if (l.village && villageStats[l.village] !== undefined) {
+              villageStats[l.village] += 1;
+            } else if (l.village) {
+              villageStats[l.village] = 1;
+            }
+          });
+
+          const up = {
+            ...current,
+            totalVisitors: Math.max(current.totalVisitors + 1, updatedLogs.length),
+            todayVisitors: Math.max(current.todayVisitors + 1, updatedLogs.length),
+            registeredUsers: updatedLogs.length,
+            villageStats,
+            recentLogs: updatedLogs
+          };
+          localStorage.setItem('fs_analytics', JSON.stringify(up));
+          return up;
+        });
       };
 
       const canCreateGame = isSuperAdminUnlocked || currentRole === 'super_admin' || currentRole === 'hall_admin' || currentRole === 'admin' || isAdmin;
@@ -1192,7 +1254,7 @@
                     id="login_name"
                     defaultValue={userProfile.name}
                     required
-                    placeholder="Masalan: Azizbek Fayziyev"
+                    placeholder="Ismingiz va familiyangizni kiriting"
                     className={`w-full pl-9 pr-3 py-2.5 rounded-xl border ${isDark ? 'bg-zinc-950 border-zinc-800' : 'bg-zinc-50 border-zinc-300'} font-semibold focus:outline-none focus:border-emerald-500`}
                   />
                 </div>
@@ -1916,100 +1978,151 @@
                       </button>
                     </div>
 
-                    {/* NECHTA ODAM KIRGANI HAQIDA HISOBOT */}
+                    {/* HAQIQIY STATISTIKA VA TASHRIFLAR HISOBOTI */}
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
-                        <h3 className="text-base font-black flex items-center gap-2">
-                          <BarChartIcon className="w-5 h-5 text-cyan-400" />
-                          Odamlar kirishi va platforma tashriflari hisoboti
-                        </h3>
-                        <span className="text-xs text-emerald-400 font-bold">Onlayn hisoblagich</span>
+                        <div>
+                          <h3 className="text-base font-black flex items-center gap-2">
+                            <BarChartIcon className="w-5 h-5 text-cyan-400" />
+                            Odamlar kirishi va platforma tashriflari hisoboti
+                          </h3>
+                          <p className="text-[11px] text-zinc-400 mt-0.5">Faqat haqiqatda saytga kirgan va ro'yxatdan o'tgan foydalanuvchilar hisobi</p>
+                        </div>
+                        <span className="text-xs text-emerald-400 font-bold bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/30">
+                          Jonli real-time
+                        </span>
                       </div>
 
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                         <div className={`p-4 rounded-2xl border ${cardBg} space-y-1`}>
                           <span className="text-[11px] text-zinc-400 font-semibold block">Jami kirganlar soni:</span>
                           <p className="text-2xl font-black text-cyan-400">{analytics.totalVisitors.toLocaleString()}</p>
-                          <span className="text-[10px] text-emerald-400 font-bold">+14% o'sish</span>
+                          <span className="text-[10px] text-cyan-400 font-medium">Haqiqiy tashriflar</span>
                         </div>
 
                         <div className={`p-4 rounded-2xl border ${cardBg} space-y-1`}>
                           <span className="text-[11px] text-zinc-400 font-semibold block">Bugungi tashriflar:</span>
                           <p className="text-2xl font-black text-emerald-400">{analytics.todayVisitors.toLocaleString()}</p>
-                          <span className="text-[10px] text-zinc-500 font-medium">Faol odamlar</span>
+                          <span className="text-[10px] text-emerald-400 font-medium">Bugun kirganlar</span>
                         </div>
 
                         <div className={`p-4 rounded-2xl border ${cardBg} space-y-1`}>
                           <span className="text-[11px] text-zinc-400 font-semibold block">Ro'yxatdan o'tganlar:</span>
                           <p className="text-2xl font-black text-amber-400">{analytics.registeredUsers.toLocaleString()}</p>
-                          <span className="text-[10px] text-zinc-500 font-medium">Telefon raqam bilan</span>
+                          <span className="text-[10px] text-amber-400 font-medium">Telefon bilan kirganlar</span>
                         </div>
 
                         <div className={`p-4 rounded-2xl border ${cardBg} space-y-1`}>
-                          <span className="text-[11px] text-zinc-400 font-semibold block">Oylik obuna tushumi:</span>
-                          <p className="text-2xl font-black text-emerald-400">2,450,000</p>
-                          <span className="text-[10px] text-zinc-500 font-medium">so'm</span>
+                          <span className="text-[11px] text-zinc-400 font-semibold block">Obuna tushumi:</span>
+                          <p className="text-2xl font-black text-emerald-400">{analytics.subscriptionRevenue ? analytics.subscriptionRevenue.toLocaleString() : "0"}</p>
+                          <span className="text-[10px] text-zinc-500 font-medium">so'm (Haqiqiy)</span>
                         </div>
                       </div>
 
-                      {/* Qishloqlar ulushi */}
+                      {/* Qishloq va shaharlar bo'yicha haqiqiy ulush */}
                       <div className={`p-4 rounded-2xl border ${cardBg} space-y-3`}>
-                        <h4 className="text-xs font-black uppercase tracking-wide text-zinc-400">
-                          Qishloqlar bo'yicha kiruvchilar ulushi (Vodil, Yoshlarobod, Novkat):
-                        </h4>
-                        <div className="space-y-2 text-xs">
-                          <div>
-                            <div className="flex justify-between mb-1">
-                              <span className="font-bold">Vodil qishlog'i (Dam olish zonasi)</span>
-                              <span className="text-cyan-400 font-bold">{analytics.villageStats.Vodil} kishi (52%)</span>
-                            </div>
-                            <div className="w-full h-2 rounded-full bg-zinc-800 overflow-hidden">
-                              <div className="h-full bg-cyan-400 rounded-full" style={{ width: '52%' }} />
-                            </div>
-                          </div>
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-xs font-black uppercase tracking-wide text-zinc-400">
+                            Hududlar bo'yicha haqiqiy kiruvchilar ulushi:
+                          </h4>
+                          <span className="text-[10px] text-zinc-400 font-medium">
+                            Jami: {analytics.registeredUsers} nafar ro'yxatdan o'tgan
+                          </span>
+                        </div>
 
-                          <div>
-                            <div className="flex justify-between mb-1">
-                              <span className="font-bold">Yoshlarobod hududi</span>
-                              <span className="text-emerald-400 font-bold">{analytics.villageStats.Yoshlarobod} kishi (28%)</span>
-                            </div>
-                            <div className="w-full h-2 rounded-full bg-zinc-800 overflow-hidden">
-                              <div className="h-full bg-emerald-400 rounded-full" style={{ width: '28%' }} />
-                            </div>
-                          </div>
-
-                          <div>
-                            <div className="flex justify-between mb-1">
-                              <span className="font-bold">Novkat qishlog'i</span>
-                              <span className="text-purple-400 font-bold">{analytics.villageStats.Novkat} kishi (20%)</span>
-                            </div>
-                            <div className="w-full h-2 rounded-full bg-zinc-800 overflow-hidden">
-                              <div className="h-full bg-purple-400 rounded-full" style={{ width: '20%' }} />
-                            </div>
-                          </div>
+                        <div className="space-y-2.5 text-xs">
+                          {[
+                            { name: "Farg'ona shahri", key: "Farg'ona", color: "bg-blue-500", text: "text-blue-400" },
+                            { name: "Vodil qishlog'i", key: "Vodil", color: "bg-cyan-400", text: "text-cyan-400" },
+                            { name: "Yoshlarobod hududi (55-maktab)", key: "Yoshlarobod", color: "bg-emerald-400", text: "text-emerald-400" },
+                            { name: "Novkat qishlog'i", key: "Novkat", color: "bg-purple-400", text: "text-purple-400" }
+                          ].map(area => {
+                            const count = (analytics.villageStats && analytics.villageStats[area.key]) || 0;
+                            const total = analytics.registeredUsers || 0;
+                            const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+                            return (
+                              <div key={area.key}>
+                                <div className="flex justify-between mb-1">
+                                  <span className="font-bold">{area.name}</span>
+                                  <span className={`${area.text} font-bold`}>{count} kishi ({pct}%)</span>
+                                </div>
+                                <div className="w-full h-2 rounded-full bg-zinc-800 overflow-hidden">
+                                  <div className={`h-full ${area.color} rounded-full transition-all duration-500`} style={{ width: `${pct}%` }} />
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
                       </div>
 
                       {/* Loglar */}
                       <div className={`rounded-2xl border ${cardBg} overflow-hidden`}>
-                        <div className="p-3 border-b border-zinc-800 flex items-center justify-between">
-                          <h4 className="text-xs font-black uppercase text-zinc-400">So'nggi kirgan foydalanuvchilar oqimi</h4>
-                          <span className="text-[10px] text-emerald-400 font-bold">Real-time log</span>
+                        <div className="p-3.5 border-b border-zinc-800 flex items-center justify-between">
+                          <div>
+                            <h4 className="text-xs font-black uppercase text-zinc-400">Haqiqiy kirgan foydalanuvchilar oqimi</h4>
+                            <p className="text-[10px] text-zinc-500 mt-0.5">Faqat telefon raqami va ismini kiritib kirgan haqiqiy odamlar</p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                              Haqiqiy log ({analytics.recentLogs ? analytics.recentLogs.length : 0})
+                            </span>
+                            {analytics.recentLogs && analytics.recentLogs.length > 0 && (
+                              <button
+                                onClick={() => {
+                                  if (confirm("Haqiqatan ham barcha loglarni tozalamoqchimisiz?")) {
+                                    const emptyData = {
+                                      totalVisitors: 0,
+                                      todayVisitors: 0,
+                                      registeredUsers: 0,
+                                      subscriptionRevenue: 0,
+                                      villageStats: { "Farg'ona": 0, "Vodil": 0, "Yoshlarobod": 0, "Novkat": 0 },
+                                      recentLogs: []
+                                    };
+                                    setAnalytics(emptyData);
+                                    localStorage.setItem('fs_analytics', JSON.stringify(emptyData));
+                                    showToast("Statistika va loglar tozalandi!");
+                                  }
+                                }}
+                                className="text-[10px] text-rose-400 hover:text-rose-300 font-bold px-2 py-0.5 rounded bg-rose-500/10 border border-rose-500/20 transition-all"
+                                title="Loglarni tozalash"
+                              >
+                                Tozalash
+                              </button>
+                            )}
+                          </div>
                         </div>
-                        <div className="divide-y divide-zinc-800">
-                          {analytics.recentLogs.map(log => (
-                            <div key={log.id} className="p-3 flex items-center justify-between text-xs">
-                              <div>
-                                <p className="font-bold">{log.name} ({log.phone})</p>
-                                <p className="text-[11px] text-zinc-400">{log.village} • {log.device}</p>
+
+                        {(!analytics.recentLogs || analytics.recentLogs.length === 0) ? (
+                          <div className="p-8 text-center text-zinc-500 space-y-2">
+                            <div className="text-2xl">👥</div>
+                            <p className="text-xs font-bold text-zinc-400">Hozircha yangi kirgan foydalanuvchilar yo'q</p>
+                            <p className="text-[11px] text-zinc-500 max-w-xs mx-auto">
+                              Odamlar o'z ismi va telefon raqami bilan kirishlari bilanoq, ularning haqiqiy ma'lumotlari shu yerda paydo bo'ladi.
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="divide-y divide-zinc-800">
+                            {analytics.recentLogs.map(log => (
+                              <div key={log.id} className="p-3.5 flex items-center justify-between text-xs hover:bg-zinc-900/30 transition-colors">
+                                <div className="space-y-0.5">
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-bold text-white text-sm">{log.name}</span>
+                                    <span className="font-mono text-emerald-400 font-bold text-xs">({log.phone})</span>
+                                  </div>
+                                  <p className="text-[11px] text-zinc-400">
+                                    📍 {log.village} • 📱 {log.device}
+                                  </p>
+                                </div>
+                                <div className="text-right space-y-1">
+                                  <span className="text-[10px] font-bold text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 px-2 py-0.5 rounded">
+                                    {log.sport || "Voleybol"}
+                                  </span>
+                                  <p className="text-[10px] text-zinc-400">{log.time}</p>
+                                </div>
                               </div>
-                              <div className="text-right">
-                                <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">{log.sport}</span>
-                                <p className="text-[10px] text-zinc-500 mt-0.5">{log.time}</p>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
 
